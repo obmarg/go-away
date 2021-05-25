@@ -1,4 +1,5 @@
 mod inspect;
+mod output;
 mod types;
 
 pub use inspect::Inspect;
@@ -17,12 +18,18 @@ pub enum FieldType {
 
 pub enum Primitive {
     String,
-    Float64,
+    Float,
     Int,
     Bool,
 }
 
 pub struct TypeRef {}
+
+impl TypeRef {
+    fn name(&self) -> String {
+        todo!()
+    }
+}
 
 pub struct TypeRegistry {}
 
@@ -46,13 +53,7 @@ impl TypeRegistry {
     }
 
     // Ok, so if this deals w/ union types (i.e. enums w/ data)
-    pub fn register_union(&mut self) -> TypeRef {}
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    pub fn register_union(&mut self) -> TypeRef {
+        todo!()
     }
 }
