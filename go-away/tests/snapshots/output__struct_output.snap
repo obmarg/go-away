@@ -6,9 +6,16 @@ expression: "go_away::registry_to_output(registry)"
 type Nested struct {
 	AString string `json:"some_other_name"`
 	AnInt int `json:"an_int"`
+	FulfilmentType FulfilmentType `json:"fulfilment_type"`
 }
 type MyData struct {
 	FieldOne string `json:"field_one"`
 	Nested Nested `json:"nested"`
 }
+type FulfilmentType string
+
+const (
+	Delivery FulfilmentType = "Delivery"
+	Collection FulfilmentType = "Collection"
+)
 

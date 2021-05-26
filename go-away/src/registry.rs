@@ -1,13 +1,18 @@
-pub use super::{types::Struct, TypeRef};
+pub use super::{
+    types::{Enum, Struct},
+    TypeRef,
+};
 
+#[derive(Default)]
 pub struct TypeRegistry {
     pub(super) structs: Vec<Struct>,
+    pub(super) enums: Vec<Enum>,
 }
 
 // TODO: these methods maybe need to take/return some sort of UUID that identifies the type...
 impl TypeRegistry {
     pub fn new() -> Self {
-        TypeRegistry { structs: vec![] }
+        TypeRegistry::default()
     }
 
     // Ok, so structs come in these varieties
@@ -26,8 +31,10 @@ impl TypeRegistry {
     }
 
     // This deals w/ the simple enum case
-    pub fn register_enum(&mut self) -> TypeRef {
-        todo!()
+    pub fn register_enum(&mut self, details: Enum) -> TypeRef {
+        let name = details.name.clone();
+        self.enums.push(details);
+        TypeRef { name }
     }
 
     // Ok, so if this deals w/ union types (i.e. enums w/ data)

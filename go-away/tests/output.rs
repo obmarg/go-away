@@ -15,6 +15,13 @@ struct Nested {
     #[serde(rename = "some_other_name")]
     a_string: String,
     an_int: i64,
+    fulfilment_type: FulfilmentType,
+}
+
+#[derive(TypeMetadata)]
+enum FulfilmentType {
+    Delivery,
+    Collection,
 }
 
 #[test]

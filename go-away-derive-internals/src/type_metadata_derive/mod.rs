@@ -7,6 +7,8 @@ use serde_derive_internals::{
 };
 
 pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
+    use quote::TokenStreamExt;
+
     let ctx = Ctxt::new();
 
     let container =
@@ -25,11 +27,30 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
     }
 
     let ident = &container.ident;
+    let name_literal = Literal::string(&ident.to_string());
     let mut inner = TokenStream::new();
     match container.data {
         Data::Enum(variants) if variants.iter().all(|v| matches!(v.style, Style::Unit)) => {
-            // TODO: Map this to a go "enum"
-            todo!()
+            inner.append_all(quote! {
+                let mut rv = types::Enum {
+                    name: #name_literal.into(),
+                    variants: vec![]
+                };
+            });
+            for variant in variants {
+                let variant_name = Literal::string(&variant.ident.to_string());
+                let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
+                inner.append_all(quote! {
+                    rv.variants.push(types::EnumVariant {
+                        name: #variant_name.into(),
+                        serialized_name: #serialized_name.into(),
+                    });
+                })
+            }
+
+            inner.append_all(quote! {
+                FieldType::Named(registry.register_enum(rv))
+            });
         }
         Data::Enum(variants) if variants.iter().all(|v| matches!(v.style, Style::Newtype)) => {
             // TODO: Map this to a union of the inner types
@@ -40,8 +61,6 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             todo!()
         }
         Data::Struct(_, fields) => {
-            use quote::TokenStreamExt;
-            let name_literal = Literal::string(&ident.to_string());
             inner.append_all(quote! {
                 let mut rv = types::Struct {
                     name: #name_literal.into(),

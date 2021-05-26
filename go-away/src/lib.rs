@@ -16,6 +16,9 @@ pub fn registry_to_output(registry: TypeRegistry) -> String {
     for st in registry.structs {
         write!(&mut output, "{}", output::GoType::Struct(st)).unwrap();
     }
+    for en in registry.enums {
+        write!(&mut output, "{}", output::GoType::Enum(en)).unwrap();
+    }
 
     output
 }
