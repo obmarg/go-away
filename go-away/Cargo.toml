@@ -12,7 +12,10 @@ default = []
 [dependencies]
 indenter = "0.3.3"
 go-away-derive = { path = "../go-away-derive" }
+
+# Integration Deps
 uuid = { version = "0.8", optional = true }
+chrono = { version = "0.4", optional = true }
 
 [dev-dependencies]
 insta = "1.7.1"

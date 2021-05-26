@@ -60,6 +60,13 @@ impl TypeMetadata for uuid::Uuid {
     }
 }
 
+#[cfg(feature = "chrono")]
+impl<Tz: chrono::offset::TimeZone> TypeMetadata for chrono::DateTime<Tz> {
+    fn metadata(_: &mut TypeRegistry) -> FieldType {
+        FieldType::Primitive(Primitive::String)
+    }
+}
+
 macro_rules! metadata_for_int {
     () => {};
     ($this:ty, $($tail:tt)*) => {
