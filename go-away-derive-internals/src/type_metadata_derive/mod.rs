@@ -2,7 +2,7 @@ use proc_macro2::{Literal, TokenStream};
 use quote::quote;
 
 use serde_derive_internals::{
-    ast::{Container, Data, Style},
+    ast::{Container, Data, Field, Style},
     attr::TagType,
     Ctxt,
 };
@@ -79,10 +79,10 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
                 let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
                 let variant_type = variant.fields.first().unwrap().ty;
                 inner.append_all(quote! {
-                    #variant_type::metadata(registry);
                     rv.variants.push(
                         types::UnionVariant {
-                            name: #variant_name.to_string(),
+                            name: Some(#variant_name.to_string()),
+                            ty: #variant_type::metadata(registry),
                             serialized_name: #serialized_name.to_string()
                         }
                     );
@@ -93,32 +93,51 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             })
         }
         Data::Enum(variants) => {
-            // TODO: Map this to a union of the inner types
-            todo!()
-        }
-        Data::Struct(_, fields) => {
+            let repr = match container.attrs.tag() {
+                TagType::Adjacent { tag, content } => {
+                    let tag = Literal::string(tag);
+                    let content = Literal::string(content);
+                    quote! {
+                        types::UnionRepresentation::AdjacentlyTagged {
+                            tag: #tag.into(),
+                            content: #content.into()
+                        }
+                    }
+                }
+                _ => todo!("do the other tag types"),
+            };
             inner.append_all(quote! {
-                let mut rv = types::Struct {
+                let mut rv = types::Union {
                     name: #name_literal.into(),
-                    fields: vec![]
+                    representation: #repr,
+                    variants: vec![]
                 };
             });
-            for field in fields {
-                let field_name = name_of_member(&field.member);
-                let serialized_name = Literal::string(&field.attrs.name().serialize_name());
-                let ty = field.ty;
+            for variant in variants {
+                let variant_name = Literal::string(&variant.ident.to_string());
+                let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
+                let inner_type_block = struct_block(&variant.ident.to_string(), &variant.fields);
                 inner.append_all(quote! {
-                    rv.fields.push(
-                        types::Field {
-                            name: #field_name.into(),
-                            serialized_name: #serialized_name.into(),
-                            ty: #ty::metadata(registry)
+                    rv.variants.push(
+                        types::UnionVariant {
+                            name: Some(#variant_name.to_string()),
+                            ty: FieldType::Named({#inner_type_block}),
+                            serialized_name: #serialized_name.to_string()
                         }
                     );
-                });
+                })
             }
             inner.append_all(quote! {
-                FieldType::Named(registry.register_struct(rv))
+                FieldType::Named(registry.register_union(rv))
+            })
+        }
+        Data::Struct(_, fields) => {
+            let struct_block_contents = struct_block(&ident.to_string(), &fields);
+            inner.append_all(quote! {
+                let type_ref = {
+                    #struct_block_contents
+                };
+                FieldType::Named(type_ref)
             })
         }
     }
@@ -132,6 +151,39 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             }
         }
     })
+}
+
+fn struct_block(name: &str, fields: &[Field]) -> TokenStream {
+    use quote::TokenStreamExt;
+
+    let mut rv = TokenStream::new();
+
+    let name_literal = Literal::string(name);
+    rv.append_all(quote! {
+        let mut st = types::Struct {
+            name: #name_literal.into(),
+            fields: vec![]
+        };
+    });
+    for field in fields {
+        let field_name = name_of_member(&field.member);
+        let serialized_name = Literal::string(&field.attrs.name().serialize_name());
+        let ty = field.ty;
+        rv.append_all(quote! {
+            st.fields.push(
+                types::Field {
+                    name: #field_name.into(),
+                    serialized_name: #serialized_name.into(),
+                    ty: #ty::metadata(registry)
+                }
+            );
+        });
+    }
+    rv.append_all(quote! {
+        registry.register_struct(st)
+    });
+
+    rv
 }
 
 fn name_of_member(member: &syn::Member) -> proc_macro2::Literal {

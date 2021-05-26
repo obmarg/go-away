@@ -3,18 +3,20 @@ source: go-away/tests/output.rs
 expression: "go_away::registry_to_output(registry)"
 
 ---
-type One struct {
-	X float64 `json:"x"`
+type OptionOne struct {
+	X string `json:"x"`
+	Y int `json:"y"`
 }
-type Two struct {
-	Y bool `json:"y"`
+type OptionTwo struct {
+	Foo string `json:"foo"`
+	Bar int `json:"bar"`
 }
-type NewTypeEnum struct {
-	*One
-	*Two
+type StructEnum struct {
+	*OptionOne
+	*OptionTwo
 }
 
-func (self *NewTypeEnum) MarshalJSON() ([]byte, error) {
+func (self *StructEnum) MarshalJSON() ([]byte, error) {
 	if self.OptionOne != nil {
 		var output map[string]interface{}
 		output["k"] = "OptionOne"

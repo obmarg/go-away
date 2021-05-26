@@ -31,7 +31,8 @@ pub struct Union {
 }
 
 pub struct UnionVariant {
-    pub name: String,
+    pub name: Option<String>,
+    pub ty: super::FieldType,
     pub serialized_name: String,
 }
 

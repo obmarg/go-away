@@ -39,7 +39,7 @@ impl fmt::Display for GoType {
             GoType::Union(details) => {
                 writeln!(f, "type {} struct {{", details.name)?;
                 for variant in &details.variants {
-                    writeln!(indented(f), "*{}", variant.name)?;
+                    writeln!(indented(f), "*{}", variant.ty.go_type())?;
                 }
                 writeln!(f, "}}\n")?;
                 write!(f, "{}", UnionMarshal(&details))?;
@@ -95,7 +95,7 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
         let last_i = details.variants.len() - 1;
         for (i, variant) in details.variants.iter().enumerate() {
             let f = &mut indented(f);
-            writeln!(f, "if self.{} != nil {{", variant.name)?;
+            writeln!(f, "if self.{} != nil {{", variant.go_name())?;
             // TODO: Use the correct marshallar
             write!(
                 indented(f),
@@ -117,6 +117,16 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
     }
 }
 
+impl UnionVariant {
+    fn go_name(&self) -> String {
+        match (&self.name, &self.ty) {
+            (Some(name), _) => name.clone(),
+            (_, FieldType::Named(type_ref)) => type_ref.name().to_string(),
+            _ => todo!("Variant must be named or named type for now (fix this later)"),
+        }
+    }
+}
+
 struct AdjacentlyTaggedMarshaller<'a> {
     tag: &'a str,
     content: &'a str,
@@ -134,7 +144,8 @@ impl<'a> fmt::Display for AdjacentlyTaggedMarshaller<'a> {
         writeln!(
             f,
             r#"output["{}"] = self.{}"#,
-            self.content, self.variant.name
+            self.content,
+            self.variant.go_name()
         )?;
         writeln!(f, "return json.Marshal(output)")
     }
@@ -173,7 +184,7 @@ pub fn indented<D: fmt::Write>(f: &mut D) -> indenter::Indented<'_, D> {
 mod tests {
     use insta::assert_snapshot;
 
-    use super::*;
+    use super::{super::TypeRef, *};
 
     #[test]
     fn test_primitive_structs() {
@@ -260,11 +271,17 @@ mod tests {
             },
             variants: vec![
                 UnionVariant {
-                    name: "VarOne".into(),
+                    name: Some("VarOne".into()),
+                    ty: FieldType::Named(TypeRef {
+                        name: "VarOne".into()
+                    }),
                     serialized_name: "VAR_ONE".into(),
                 },
                 UnionVariant {
-                    name: "VarTwo".into(),
+                    name: Some("VarTwo".into()),
+                    ty: FieldType::Named(TypeRef {
+                        name: "VarTwo".into()
+                    }),
                     serialized_name: "VAR_TWO".into(),
                 }
             ]

@@ -6,20 +6,23 @@ expression: "test_conversion(quote! {\n                    struct MyData { field
 impl ::go_away::TypeMetadata for MyData {
     fn metadata(registry: &mut ::go_away::TypeRegistry) -> ::go_away::FieldType {
         use go_away::{types, FieldType};
-        let mut rv = types::Struct {
-            name: "MyData".into(),
-            fields: vec![],
+        let type_ref = {
+            let mut st = types::Struct {
+                name: "MyData".into(),
+                fields: vec![],
+            };
+            st.fields.push(types::Field {
+                name: "field_one".into(),
+                serialized_name: "field_one".into(),
+                ty: String::metadata(registry),
+            });
+            st.fields.push(types::Field {
+                name: "field_two".into(),
+                serialized_name: "field_two".into(),
+                ty: String::metadata(registry),
+            });
+            registry.register_struct(st)
         };
-        rv.fields.push(types::Field {
-            name: "field_one".into(),
-            serialized_name: "field_one".into(),
-            ty: String::metadata(registry),
-        });
-        rv.fields.push(types::Field {
-            name: "field_two".into(),
-            serialized_name: "field_two".into(),
-            ty: String::metadata(registry),
-        });
-        FieldType::Named(registry.register_struct(rv))
+        FieldType::Named(type_ref)
     }
 }
