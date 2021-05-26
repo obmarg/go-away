@@ -1,0 +1,25 @@
+---
+source: go-away-derive-internals/src/type_metadata_derive/mod.rs
+expression: "test_conversion(quote! {\n                    struct MyData { field_one : String, field_two : String }\n                })"
+
+---
+impl ::go_away::TypeMetadata for MyData {
+    fn metadata(registry: &mut TypeRegistry) -> FieldType {
+        use go_away::{types, FieldType};
+        let rv = types::Struct {
+            name: "MyData",
+            fields: vec![],
+        };
+        rv.fields.push(types::Field {
+            name: "field_one",
+            serialized_name: "field_one",
+            ty: String::metadata(),
+        });
+        rv.fields.push(types::Field {
+            name: "field_two",
+            serialized_name: "field_two",
+            ty: String::metadata(),
+        });
+        FieldType::Named(registry.register_struct(rv))
+    }
+}

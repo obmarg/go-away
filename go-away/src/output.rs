@@ -69,7 +69,7 @@ impl<'a> fmt::Display for GoField<'a> {
 impl FieldType {
     fn go_type(&self) -> String {
         match self {
-            FieldType::Named(type_ref) => type_ref.name(),
+            FieldType::Named(type_ref) => type_ref.name().to_string(),
             FieldType::Optional(inner) => format!("*{}", inner.go_type()),
             FieldType::List(inner) => format!("[]{}", inner.go_type()),
             FieldType::Map { key, value } => format!("map[{}]{}", key.go_type(), value.go_type()),

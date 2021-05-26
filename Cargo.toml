@@ -1,3 +1,7 @@
 [workspace]
 
-members = ["go-away"]
+members = [
+    "go-away",
+    "go-away-derive",
+    "go-away-derive-internals"
+    ]

@@ -1,0 +1,12 @@
+[package]
+name = "go-away-derive"
+version = "0.1.0"
+authors = ["Graeme Coupar <grambo@grambo.me.uk>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1.0"
+go-away-derive-internals = { path = "../go-away-derive-internals" }
