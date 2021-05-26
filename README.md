@@ -11,7 +11,7 @@
   </p>
 
   <h4>
-    <a href="https://github.com/obmarg/cynic/blob/master/CHANGELOG.md">Changelog</a>
+    <a href="https://github.com/obmarg/go-away/blob/master/CHANGELOG.md">Changelog</a>
   </h4>
 </div>
 
