@@ -1,10 +1,16 @@
 [package]
 name = "go-away"
 version = "0.1.0"
-authors = ["Graeme Coupar <grambo@grambo.me.uk>"]
+authors = ["Graeme Coupar <graeme@polyandglot.dev>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MPL-2.0"
+description = "Generates go types from rust types"
+homepage = "https://github.com/obmarg/go-away"
+documentation = "https://github.com/obmarg/go-away"
+repository = "https://github.com/obmarg/go-away"
+readme = "../README.md"
+keywords = ["golang", "codegen", "generate", "types"]
+categories = ["development-tools", "development-tools::ffi", "encoding", "web-programming"]
 
 [features]
 default = []
