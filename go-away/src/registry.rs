@@ -1,5 +1,5 @@
 pub use super::{
-    types::{Enum, Struct, Union},
+    types::{Enum, NewType, Struct, Union},
     TypeRef,
 };
 
@@ -8,6 +8,7 @@ pub struct TypeRegistry {
     pub(super) structs: Vec<Struct>,
     pub(super) enums: Vec<Enum>,
     pub(super) unions: Vec<Union>,
+    pub(super) newtypes: Vec<NewType>,
 }
 
 // TODO: these methods maybe need to take/return some sort of UUID that identifies the type...
@@ -27,8 +28,10 @@ impl TypeRegistry {
     }
 
     // Deals w/ newtypes
-    pub fn register_newtype(&mut self) -> TypeRef {
-        todo!()
+    pub fn register_newtype(&mut self, details: NewType) -> TypeRef {
+        let name = details.name.clone();
+        self.newtypes.push(details);
+        TypeRef { name }
     }
 
     // This deals w/ the simple enum case

@@ -22,6 +22,9 @@ pub fn registry_to_output(registry: TypeRegistry) -> String {
     for un in registry.unions {
         write!(&mut output, "{}", output::GoType::Union(un)).unwrap();
     }
+    for nt in registry.newtypes {
+        write!(&mut output, "{}", output::GoType::NewType(nt)).unwrap();
+    }
 
     output
 }

@@ -95,16 +95,20 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
         for variant in details.variants.iter() {
             let f = &mut indented(f);
             writeln!(f, "if self.{} != nil {{", variant.go_name())?;
-            // TODO: Use the correct marshallar
-            write!(
-                indented(f),
-                "{}",
-                AdjacentlyTaggedMarshaller {
-                    tag: "k",
-                    content: "c",
-                    variant: &variant
+            match &details.representation {
+                UnionRepresentation::AdjacentlyTagged { tag, content } => {
+                    write!(
+                        indented(f),
+                        "{}",
+                        AdjacentlyTaggedMarshaller {
+                            tag,
+                            content,
+                            variant: &variant
+                        }
+                    )?;
                 }
-            )?;
+                _ => todo!("Implement the other tagging enum representations"),
+            }
             write!(f, "}}")?;
             write!(f, " else ")?;
         }
@@ -201,11 +205,12 @@ impl<'a> fmt::Display for UnionUnmarshal<'a> {
                 writeln!(f, "}}")?;
                 writeln!(f, "return nil")?;
             }
-            _ => todo!("Support other tagging strategies"),
+            _ => todo!("Support other enum representaitons"),
         }
         writeln!(f, "}}")?;
 
         // TODO: Support anything other than Adjacent tagging
+        //todo!("Write UnionUnmarshal")
         Ok(())
     }
 }

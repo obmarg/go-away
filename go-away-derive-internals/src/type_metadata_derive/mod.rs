@@ -132,13 +132,24 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             })
         }
         Data::Struct(_, fields) => {
-            let struct_block_contents = struct_block(&ident.to_string(), &fields);
-            inner.append_all(quote! {
-                let type_ref = {
-                    #struct_block_contents
-                };
-                FieldType::Named(type_ref)
-            })
+            if fields.len() == 1 {
+                let field = fields.first().unwrap().ty;
+                inner.append_all(quote! {
+                    let nt = types::NewType {
+                        name: #name_literal.to_string(),
+                        inner: #field::metadata(registry),
+                    };
+                    FieldType::Named(registry.register_newtype(nt))
+                })
+            } else {
+                let struct_block_contents = struct_block(&ident.to_string(), &fields);
+                inner.append_all(quote! {
+                    let type_ref = {
+                        #struct_block_contents
+                    };
+                    FieldType::Named(type_ref)
+                })
+            }
         }
     }
 

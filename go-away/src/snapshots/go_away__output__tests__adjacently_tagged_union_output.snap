@@ -11,13 +11,13 @@ type MyUnion struct {
 func (self *MyUnion) MarshalJSON() ([]byte, error) {
 	if self.VarOne != nil {
 		var output map[string]interface{}
-		output["k"] = "VAR_ONE"
-		output["c"] = self.VarOne
+		output["type"] = "VAR_ONE"
+		output["data"] = self.VarOne
 		return json.Marshal(output)
 	} else 	if self.VarTwo != nil {
 		var output map[string]interface{}
-		output["k"] = "VAR_TWO"
-		output["c"] = self.VarTwo
+		output["type"] = "VAR_TWO"
+		output["data"] = self.VarTwo
 		return json.Marshal(output)
 	} else 	{
 		return json.Marshal(nil)
