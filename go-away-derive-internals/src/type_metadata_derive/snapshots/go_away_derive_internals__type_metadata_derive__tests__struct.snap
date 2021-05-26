@@ -15,12 +15,12 @@ impl ::go_away::TypeMetadata for MyData {
             st.fields.push(types::Field {
                 name: "field_one".into(),
                 serialized_name: "field_one".into(),
-                ty: String::metadata(registry),
+                ty: <String as ::go_away::TypeMetadata>::metadata(registry),
             });
             st.fields.push(types::Field {
                 name: "field_two".into(),
                 serialized_name: "field_two".into(),
-                ty: String::metadata(registry),
+                ty: <String as ::go_away::TypeMetadata>::metadata(registry),
             });
             registry.register_struct(st)
         };

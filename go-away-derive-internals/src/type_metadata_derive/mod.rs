@@ -77,12 +77,12 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             for variant in variants {
                 let variant_name = Literal::string(&variant.ident.to_string());
                 let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
-                let variant_type = variant.fields.first().unwrap().ty;
+                let metadata_call = metadata_call(variant.fields.first().unwrap().ty);
                 inner.append_all(quote! {
                     rv.variants.push(
                         types::UnionVariant {
                             name: Some(#variant_name.to_string()),
-                            ty: #variant_type::metadata(registry),
+                            ty: #metadata_call,
                             serialized_name: #serialized_name.to_string()
                         }
                     );
@@ -133,11 +133,11 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
         }
         Data::Struct(_, fields) => {
             if fields.len() == 1 {
-                let field = fields.first().unwrap().ty;
+                let metadata_call = metadata_call(fields.first().unwrap().ty);
                 inner.append_all(quote! {
                     let nt = types::NewType {
                         name: #name_literal.to_string(),
-                        inner: #field::metadata(registry),
+                        inner: #metadata_call,
                     };
                     FieldType::Named(registry.register_newtype(nt))
                 })
@@ -180,13 +180,13 @@ fn struct_block(name: &str, fields: &[Field]) -> TokenStream {
     for field in fields {
         let field_name = name_of_member(&field.member);
         let serialized_name = Literal::string(&field.attrs.name().serialize_name());
-        let ty = field.ty;
+        let ty_def = metadata_call(&field.ty);
         rv.append_all(quote! {
             st.fields.push(
                 types::Field {
                     name: #field_name.into(),
                     serialized_name: #serialized_name.into(),
-                    ty: #ty::metadata(registry)
+                    ty: #ty_def
                 }
             );
         });
@@ -196,6 +196,14 @@ fn struct_block(name: &str, fields: &[Field]) -> TokenStream {
     });
 
     rv
+}
+
+fn metadata_call(ty: &syn::Type) -> proc_macro2::TokenStream {
+    match ty {
+        syn::Type::Reference(r) => metadata_call(r.elem.as_ref()),
+        syn::Type::Paren(r) => metadata_call(r.elem.as_ref()),
+        other => quote! { <#other as ::go_away::TypeMetadata>::metadata(registry) },
+    }
 }
 
 fn name_of_member(member: &syn::Member) -> proc_macro2::Literal {
