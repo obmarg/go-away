@@ -17,7 +17,7 @@ default = []
 
 [dependencies]
 indenter = "0.3.3"
-go-away-derive = { path = "../go-away-derive" }
+go-away-derive = { path = "../go-away-derive", version = "0.1.0" }
 
 # Integration Deps
 uuid = { version = "0.8", optional = true }
