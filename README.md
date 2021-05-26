@@ -7,7 +7,7 @@
 
   <p>
     <a href="https://crates.io/crates/go-away"><img alt="Crate Info" src="https://img.shields.io/crates/v/go-away.svg"/></a>
-    <a href="https://docs.rs/go-away/"><img alt="API Docs" src="https://img.shields.io/badge/docs.rs-go-away-green"/></a>
+    <a href="https://docs.rs/go-away/"><img alt="API Docs" src="https://img.shields.io/badge/docs.rs-go--away-green"/></a>
   </p>
 
   <h4>
