@@ -53,6 +53,13 @@ impl TypeMetadata for bool {
     }
 }
 
+#[cfg(feature = "uuid")]
+impl TypeMetadata for uuid::Uuid {
+    fn metadata(_: &mut TypeRegistry) -> FieldType {
+        FieldType::Primitive(Primitive::String)
+    }
+}
+
 macro_rules! metadata_for_int {
     () => {};
     ($this:ty, $($tail:tt)*) => {
