@@ -3,6 +3,7 @@ source: go-away-derive-internals/src/type_metadata_derive/mod.rs
 expression: "test_conversion(quote! {\n                    struct MyData { field_one : String, field_two : String }\n                })"
 
 ---
+#[automatically_derived]
 impl ::go_away::TypeMetadata for MyData {
     fn metadata(registry: &mut ::go_away::TypeRegistry) -> ::go_away::FieldType {
         use go_away::{types, FieldType};

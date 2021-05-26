@@ -153,9 +153,10 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
         }
     }
 
-    // TODO: Need to support generics here.
+    let (impl_generics, ty_generics, where_clause) = container.generics.split_for_impl();
     Ok(quote! {
-        impl ::go_away::TypeMetadata for #ident {
+        #[automatically_derived]
+        impl #impl_generics ::go_away::TypeMetadata for #ident #ty_generics #where_clause {
             fn metadata(registry: &mut ::go_away::TypeRegistry) -> ::go_away::FieldType {
                 use ::go_away::{types, FieldType};
                 #inner
