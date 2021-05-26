@@ -6,7 +6,7 @@ edition = "2018"
 license = "MPL-2.0"
 description = "Derive internals for go-away"
 homepage = "https://github.com/obmarg/go-away"
-documentation = "https://github.com/obmarg/go-away"
+documentation = "https://docs.rs/go-away"
 repository = "https://github.com/obmarg/go-away"
 readme = "../README.md"
 

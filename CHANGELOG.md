@@ -11,6 +11,10 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+### Changes
+
+- Fixed some documentation & CHANGELOG links
+
 ## v0.1.0 - 2021-05-26
 
 - Initial release
