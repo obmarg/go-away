@@ -54,19 +54,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             });
         }
         Data::Enum(variants) if variants.iter().all(|v| matches!(v.style, Style::Newtype)) => {
-            let repr = match container.attrs.tag() {
-                TagType::Adjacent { tag, content } => {
-                    let tag = Literal::string(tag);
-                    let content = Literal::string(content);
-                    quote! {
-                        types::UnionRepresentation::AdjacentlyTagged {
-                            tag: #tag.into(),
-                            content: #content.into()
-                        }
-                    }
-                }
-                _ => todo!("do the other tag types"),
-            };
+            let repr = tag_to_representation(container.attrs.tag());
             inner.append_all(quote! {
                 let mut rv = types::Union {
                     name: #name_literal.into(),
@@ -93,19 +81,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             })
         }
         Data::Enum(variants) => {
-            let repr = match container.attrs.tag() {
-                TagType::Adjacent { tag, content } => {
-                    let tag = Literal::string(tag);
-                    let content = Literal::string(content);
-                    quote! {
-                        types::UnionRepresentation::AdjacentlyTagged {
-                            tag: #tag.into(),
-                            content: #content.into()
-                        }
-                    }
-                }
-                _ => todo!("do the other tag types"),
-            };
+            let repr = tag_to_representation(container.attrs.tag());
             inner.append_all(quote! {
                 let mut rv = types::Union {
                     name: #name_literal.into(),
@@ -196,6 +172,35 @@ fn struct_block(name: &str, fields: &[Field]) -> TokenStream {
     });
 
     rv
+}
+
+fn tag_to_representation(tag: &TagType) -> proc_macro2::TokenStream {
+    match tag {
+        TagType::Adjacent { tag, content } => {
+            let tag = Literal::string(tag);
+            let content = Literal::string(content);
+            quote! {
+                types::UnionRepresentation::AdjacentlyTagged {
+                    tag: #tag.into(),
+                    content: #content.into()
+                }
+            }
+        }
+        TagType::External => {
+            quote! { types::UnionRepresentation::ExternallyTagged }
+        }
+        TagType::Internal { tag } => {
+            let tag = Literal::string(tag);
+            quote! {
+                types::UnionRepresentation::InternallyTagged {
+                    tag: #tag.into()
+                }
+            }
+        }
+        TagType::None => {
+            quote! { types::UnionRepresentaiton::Untagged }
+        }
+    }
 }
 
 fn metadata_call(ty: &syn::Type) -> proc_macro2::TokenStream {

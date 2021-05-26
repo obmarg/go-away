@@ -39,7 +39,7 @@ pub struct UnionVariant {
 
 pub enum UnionRepresentation {
     AdjacentlyTagged { tag: String, content: String },
-    InternallyTagged,
+    InternallyTagged { tag: String },
     ExternallyTagged,
     Untagged,
 }
