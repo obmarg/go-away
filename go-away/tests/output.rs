@@ -24,10 +24,35 @@ enum FulfilmentType {
     Collection,
 }
 
+#[derive(TypeMetadata)]
+#[serde(tag = "type", content = "data")]
+enum NewTypeEnum {
+    OptionOne(One),
+    OptionTwo(Two),
+}
+
+#[derive(TypeMetadata)]
+struct One {
+    x: f32,
+}
+
+#[derive(TypeMetadata)]
+struct Two {
+    y: bool,
+}
+
 #[test]
 fn test_struct_output() {
     let mut registry = TypeRegistry::new();
     MyData::metadata(&mut registry);
+
+    assert_snapshot!(go_away::registry_to_output(registry));
+}
+
+#[test]
+fn test_newtype_enum() {
+    let mut registry = TypeRegistry::new();
+    NewTypeEnum::metadata(&mut registry);
 
     assert_snapshot!(go_away::registry_to_output(registry));
 }

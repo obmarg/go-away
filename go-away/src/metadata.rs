@@ -47,6 +47,12 @@ impl TypeMetadata for String {
     }
 }
 
+impl TypeMetadata for bool {
+    fn metadata(_: &mut TypeRegistry) -> FieldType {
+        FieldType::Primitive(Primitive::Bool)
+    }
+}
+
 macro_rules! metadata_for_int {
     () => {};
     ($this:ty, $($tail:tt)*) => {

@@ -3,6 +3,7 @@ use quote::quote;
 
 use serde_derive_internals::{
     ast::{Container, Data, Style},
+    attr::TagType,
     Ctxt,
 };
 
@@ -53,8 +54,43 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             });
         }
         Data::Enum(variants) if variants.iter().all(|v| matches!(v.style, Style::Newtype)) => {
-            // TODO: Map this to a union of the inner types
-            todo!()
+            let repr = match container.attrs.tag() {
+                TagType::Adjacent { tag, content } => {
+                    let tag = Literal::string(tag);
+                    let content = Literal::string(content);
+                    quote! {
+                        types::UnionRepresentation::AdjacentlyTagged {
+                            tag: #tag.into(),
+                            content: #content.into()
+                        }
+                    }
+                }
+                _ => todo!("do the other tag types"),
+            };
+            inner.append_all(quote! {
+                let mut rv = types::Union {
+                    name: #name_literal.into(),
+                    representation: #repr,
+                    variants: vec![]
+                };
+            });
+            for variant in variants {
+                let variant_name = Literal::string(&variant.ident.to_string());
+                let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
+                let variant_type = variant.fields.first().unwrap().ty;
+                inner.append_all(quote! {
+                    #variant_type::metadata(registry);
+                    rv.variants.push(
+                        types::UnionVariant {
+                            name: #variant_name.to_string(),
+                            serialized_name: #serialized_name.to_string()
+                        }
+                    );
+                })
+            }
+            inner.append_all(quote! {
+                FieldType::Named(registry.register_union(rv))
+            })
         }
         Data::Enum(variants) => {
             // TODO: Map this to a union of the inner types

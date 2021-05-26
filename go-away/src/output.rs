@@ -111,7 +111,7 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
                 write!(f, " else ")?;
             }
         }
-        writeln!(f, "")?;
+        writeln!(f, "\n}}")?;
 
         Ok(())
     }
@@ -128,7 +128,7 @@ impl<'a> fmt::Display for AdjacentlyTaggedMarshaller<'a> {
         writeln!(f, "var output map[string]interface{{}}")?;
         writeln!(
             f,
-            r#"output["{}"] = "{}"#,
+            r#"output["{}"] = "{}""#,
             self.tag, self.variant.serialized_name
         )?;
         writeln!(
