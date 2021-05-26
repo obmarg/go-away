@@ -1,12 +1,14 @@
-use crate::Primitive;
+use crate::types::{FieldType, Primitive};
 
-use super::{FieldType, TypeRegistry};
+use super::TypeRegistry;
 
-// TODO: Sort of liking `TypeMetadata` for this?
-// Like derive(TypeMetadata) seems good for some reason.
-// Not sure.  Think about it.
-// Reflection is also (sort of) a reasonable name
+/// Exposes metadata about a type that can be used to generate other
+/// versions of that type in other languages.
+///
+/// This is usually intended to be derived rather than manually implemented.
 pub trait TypeMetadata {
+    /// Populates `TypeRegistry` with this type and any of it's
+    /// contained types and returns a `FieldType`
     fn metadata(registry: &mut TypeRegistry) -> FieldType;
 }
 

@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 mod metadata;
 mod output;
 mod registry;
@@ -9,6 +11,9 @@ pub use registry::TypeRegistry;
 
 pub use go_away_derive::TypeMetadata;
 
+/// Generates go ocde for all the types in the TypeRegistry
+///
+/// Note that this is a WIP API and is likely to be ditched/changed in future releases.
 pub fn registry_to_output(registry: TypeRegistry) -> String {
     use std::fmt::Write;
 
@@ -27,35 +32,4 @@ pub fn registry_to_output(registry: TypeRegistry) -> String {
     }
 
     output
-}
-
-#[derive(PartialEq, Eq)]
-pub enum FieldType {
-    Optional(Box<FieldType>),
-    List(Box<FieldType>),
-    Map {
-        key: Box<FieldType>,
-        value: Box<FieldType>,
-    },
-    Named(TypeRef),
-    Primitive(Primitive),
-}
-
-#[derive(PartialEq, Eq)]
-pub enum Primitive {
-    String,
-    Float,
-    Int,
-    Bool,
-}
-
-#[derive(PartialEq, Eq)]
-pub struct TypeRef {
-    name: String,
-}
-
-impl TypeRef {
-    fn name(&self) -> &str {
-        &self.name
-    }
 }

@@ -1,6 +1,6 @@
 use std::{fmt, fmt::Write};
 
-pub use super::{types::*, FieldType, Primitive};
+pub use super::types::*;
 
 pub enum GoType {
     Struct(Struct),
@@ -239,7 +239,8 @@ pub fn indented<D: fmt::Write>(f: &mut D) -> indenter::Indented<'_, D> {
 mod tests {
     use insta::assert_snapshot;
 
-    use super::{super::TypeRef, *};
+    use super::*;
+    use crate::types::TypeRef;
 
     #[test]
     fn test_primitive_structs() {

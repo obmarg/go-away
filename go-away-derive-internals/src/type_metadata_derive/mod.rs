@@ -133,8 +133,8 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
     Ok(quote! {
         #[automatically_derived]
         impl #impl_generics ::go_away::TypeMetadata for #ident #ty_generics #where_clause {
-            fn metadata(registry: &mut ::go_away::TypeRegistry) -> ::go_away::FieldType {
-                use ::go_away::{types, FieldType};
+            fn metadata(registry: &mut ::go_away::TypeRegistry) -> ::go_away::types::FieldType {
+                use ::go_away::types::{self, FieldType};
                 #inner
             }
         }
