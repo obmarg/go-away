@@ -30,6 +30,7 @@ pub struct Union {
     pub variants: Vec<UnionVariant>,
 }
 
+#[derive(PartialEq, Eq)]
 pub struct UnionVariant {
     pub name: Option<String>,
     pub ty: super::FieldType,

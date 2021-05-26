@@ -92,8 +92,7 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
             "func (self *{}) MarshalJSON() ([]byte, error) {{",
             details.name
         )?;
-        let last_i = details.variants.len() - 1;
-        for (i, variant) in details.variants.iter().enumerate() {
+        for variant in details.variants.iter() {
             let f = &mut indented(f);
             writeln!(f, "if self.{} != nil {{", variant.go_name())?;
             // TODO: Use the correct marshallar
@@ -107,11 +106,12 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
                 }
             )?;
             write!(f, "}}")?;
-            if i != last_i {
-                write!(f, " else ")?;
-            }
+            write!(f, " else ")?;
         }
-        writeln!(f, "\n}}")?;
+        writeln!(indented(f), "{{")?;
+        writeln!(indented(f), "\treturn json.Marshal(nil)")?;
+        writeln!(indented(f), "}}")?;
+        writeln!(f, "}}")?;
 
         Ok(())
     }
@@ -156,7 +156,57 @@ impl<'a> fmt::Display for AdjacentlyTaggedMarshaller<'a> {
 
 impl<'a> fmt::Display for UnionUnmarshal<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
+        let details = self.0;
+        writeln!(
+            f,
+            "func (self *{}) UnmarshalJSON(data []byte) error {{",
+            details.name
+        )?;
+        match &details.representation {
+            UnionRepresentation::AdjacentlyTagged { tag, content } => {
+                let f = &mut indented(f);
+                writeln!(
+                    f,
+                    "temp := struct{{\n\tTag string `json:\"{}\"`\n}}{{}}",
+                    tag
+                )?;
+                writeln!(f, "if err := json.Unmarshal(data, &temp); err != nil {{")?;
+                writeln!(f, "\treturn err")?;
+                writeln!(f, "}}")?;
+                for variant in &details.variants {
+                    writeln!(f, "if temp.Tag == \"{}\" {{", variant.serialized_name)?;
+                    writeln!(
+                        indented(f),
+                        "rv := struct{{\n\tData {} `json:\"{}\"`\n}}{{}}",
+                        variant.ty.go_type(),
+                        content,
+                    )?;
+                    writeln!(
+                        indented(f),
+                        "if err := json.Unmarshal(data, &rv); err != nil {{"
+                    )?;
+                    writeln!(indented(f), "\treturn err")?;
+                    writeln!(indented(f), "}}")?;
+                    writeln!(indented(f), "self.{} = &rv.Data", variant.go_name())?;
+                    for other_variant in &details.variants {
+                        if other_variant == variant {
+                            continue;
+                        }
+                        writeln!(indented(f), "self.{} = nil", other_variant.go_name())?;
+                    }
+                    write!(f, "}} else ")?;
+                }
+                writeln!(f, "{{")?;
+                writeln!(indented(f), "return errors.New(\"Unknown type tag\")")?;
+                writeln!(f, "}}")?;
+                writeln!(f, "return nil")?;
+            }
+            _ => todo!("Support other tagging strategies"),
+        }
+        writeln!(f, "}}")?;
+
+        // TODO: Support anything other than Adjacent tagging
+        Ok(())
     }
 }
 

@@ -26,6 +26,7 @@ pub fn registry_to_output(registry: TypeRegistry) -> String {
     output
 }
 
+#[derive(PartialEq, Eq)]
 pub enum FieldType {
     Optional(Box<FieldType>),
     List(Box<FieldType>),
@@ -37,6 +38,7 @@ pub enum FieldType {
     Primitive(Primitive),
 }
 
+#[derive(PartialEq, Eq)]
 pub enum Primitive {
     String,
     Float,
@@ -44,6 +46,7 @@ pub enum Primitive {
     Bool,
 }
 
+#[derive(PartialEq, Eq)]
 pub struct TypeRef {
     name: String,
 }

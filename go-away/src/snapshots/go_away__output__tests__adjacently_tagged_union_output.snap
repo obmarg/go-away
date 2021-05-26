@@ -1,6 +1,6 @@
 ---
 source: go-away/src/output.rs
-expression: "GoType::Union(Union{name: \"MyUnion\".into(),\n                    representation:\n                        UnionRepresentation::AdjacentlyTagged{tag:\n                                                                  \"type\".into(),\n                                                              content:\n                                                                  \"data\".into(),},\n                    variants:\n                        vec![UnionVariant\n                             {\n                                 name : \"VarOne\" . into(), serialized_name :\n                                 \"VAR_ONE\" . into(),\n                             }, UnionVariant\n                             {\n                                 name : \"VarTwo\" . into(), serialized_name :\n                                 \"VAR_TWO\" . into(),\n                             }],}).to_string()"
+expression: "GoType::Union(Union{name: \"MyUnion\".into(),\n                    representation:\n                        UnionRepresentation::AdjacentlyTagged{tag:\n                                                                  \"type\".into(),\n                                                              content:\n                                                                  \"data\".into(),},\n                    variants:\n                        vec![UnionVariant\n                             {\n                                 name : Some(\"VarOne\" . into()), ty :\n                                 FieldType ::\n                                 Named(TypeRef { name : \"VarOne\" . into() }),\n                                 serialized_name : \"VAR_ONE\" . into(),\n                             }, UnionVariant\n                             {\n                                 name : Some(\"VarTwo\" . into()), ty :\n                                 FieldType ::\n                                 Named(TypeRef { name : \"VarTwo\" . into() }),\n                                 serialized_name : \"VAR_TWO\" . into(),\n                             }],}).to_string()"
 
 ---
 type MyUnion struct {
@@ -19,6 +19,38 @@ func (self *MyUnion) MarshalJSON() ([]byte, error) {
 		output["k"] = "VAR_TWO"
 		output["c"] = self.VarTwo
 		return json.Marshal(output)
+	} else 	{
+		return json.Marshal(nil)
 	}
+}
+func (self *MyUnion) UnmarshalJSON(data []byte) error {
+	temp := struct{
+		Tag string `json:"type"`
+	}{}
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+	if temp.Tag == "VAR_ONE" {
+		rv := struct{
+			Data VarOne `json:"data"`
+		}{}
+		if err := json.Unmarshal(data, &rv); err != nil {
+			return err
+		}
+		self.VarOne = &rv.Data
+		self.VarTwo = nil
+	} else if temp.Tag == "VAR_TWO" {
+		rv := struct{
+			Data VarTwo `json:"data"`
+		}{}
+		if err := json.Unmarshal(data, &rv); err != nil {
+			return err
+		}
+		self.VarTwo = &rv.Data
+		self.VarOne = nil
+	} else {
+		return errors.New("Unknown type tag")
+	}
+	return nil
 }
 

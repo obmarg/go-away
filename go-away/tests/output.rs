@@ -10,20 +10,6 @@ struct MyData {
     nested: Nested,
 }
 
-#[derive(TypeMetadata)]
-struct Nested {
-    #[serde(rename = "some_other_name")]
-    a_string: String,
-    an_int: i64,
-    fulfilment_type: FulfilmentType,
-}
-
-#[derive(TypeMetadata)]
-enum FulfilmentType {
-    Delivery,
-    Collection,
-}
-
 #[test]
 fn test_struct_output() {
     let mut registry = TypeRegistry::new();
@@ -37,6 +23,20 @@ fn test_struct_output() {
 enum NewTypeEnum {
     OptionOne(One),
     OptionTwo(Two),
+}
+
+#[derive(TypeMetadata)]
+struct Nested {
+    #[serde(rename = "some_other_name")]
+    a_string: String,
+    an_int: i64,
+    fulfilment_type: FulfilmentType,
+}
+
+#[derive(TypeMetadata)]
+enum FulfilmentType {
+    Delivery,
+    Collection,
 }
 
 #[derive(TypeMetadata)]
@@ -61,7 +61,7 @@ fn test_newtype_enum() {
 #[serde(tag = "type", content = "data")]
 enum StructEnum {
     OptionOne { x: String, y: i32 },
-    OptionTwo { foo: String, bar: i32 },
+    OptionTwo { foo: String, bar: Nested },
 }
 
 #[test]
