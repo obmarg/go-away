@@ -70,6 +70,10 @@ impl<'a> ToTokens for VariantTypeIdCall<'a> {
     }
 }
 
+/// Some generics, but with all the lifetimes replaced with 'static.
+///
+/// We need this to call `TypeId::of` because it doesn't like non static
+/// lifetimes
 struct StaticGenerics<'a>(&'a syn::Generics);
 
 impl<'a> quote::ToTokens for StaticGenerics<'a> {
