@@ -71,3 +71,18 @@ fn test_struct_enum() {
 
     assert_snapshot!(go_away::registry_to_output(registry));
 }
+
+#[derive(TypeMetadata)]
+#[serde(tag = "type")]
+enum InternallyTaggedTupleEnum {
+    One(One),
+    Two(Two),
+}
+
+#[test]
+fn test_internally_tagged_tuple_enum() {
+    let mut registry = TypeRegistry::new();
+    InternallyTaggedTupleEnum::metadata(&mut registry);
+
+    assert_snapshot!(go_away::registry_to_output(registry));
+}

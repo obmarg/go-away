@@ -17,6 +17,7 @@ default = []
 
 [dependencies]
 indenter = "0.3.3"
+indoc = "1.0"
 go-away-derive = { path = "../go-away-derive", version = "0.1.1" }
 
 # Integration Deps

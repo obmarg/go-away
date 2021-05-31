@@ -1,0 +1,60 @@
+---
+source: go-away/tests/output.rs
+expression: "go_away::registry_to_output(registry)"
+
+---
+type InternallyTaggedTupleEnum struct {
+	*One
+	*Two
+}
+
+func (self *InternallyTaggedTupleEnum) MarshalJSON() ([]byte, error) {
+	if self.One != nil {
+		return json.Marshal(struct{
+			Tag string `json:"type"`
+			One
+		}{
+			Tag: "One",
+			One: *self.One
+		})
+	} else 	if self.Two != nil {
+		return json.Marshal(struct{
+			Tag string `json:"type"`
+			Two
+		}{
+			Tag: "Two",
+			Two: *self.Two
+		})
+	} else 	{
+		return json.Marshal(nil)
+	}
+}
+func (self *InternallyTaggedTupleEnum) UnmarshalJSON(data []byte) error {
+	temp := struct{
+		Tag string `json:"type"`
+	}{}
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+	if temp.Tag == "One" {
+		var rv One
+		if err := json.Unmarshal(data, &rv); err != nil {
+			return err
+		}
+		self.One = &rv
+		self.Two = nil
+	} else if temp.Tag == "Two" {
+		var rv Two
+		if err := json.Unmarshal(data, &rv); err != nil {
+			return err
+		}
+		self.Two = &rv
+		self.One = nil
+	} else {
+		return errors.New("Unknown type tag")
+	}
+	return nil
+}
+type One float64
+type Two bool
+
