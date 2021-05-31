@@ -1,5 +1,7 @@
 use std::{fmt, fmt::Write};
 
+use indoc::writedoc;
+
 pub use super::types::*;
 
 pub enum GoType {
@@ -107,6 +109,16 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
                         }
                     )?;
                 }
+                UnionRepresentation::InternallyTagged { tag } => {
+                    write!(
+                        indented(f),
+                        "{}",
+                        InternallyTaggedMarshaller {
+                            tag,
+                            variant: &variant
+                        }
+                    )?;
+                }
                 _ => todo!("Implement the other tagging enum representations"),
             }
             write!(f, "}}")?;
@@ -139,21 +151,48 @@ struct AdjacentlyTaggedMarshaller<'a> {
 
 impl<'a> fmt::Display for AdjacentlyTaggedMarshaller<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "var output map[string]interface{{}}")?;
-        writeln!(
+        writedoc! {
             f,
-            r#"output["{}"] = "{}""#,
-            self.tag, self.variant.serialized_name
-        )?;
-        writeln!(
-            f,
-            r#"output["{}"] = self.{}"#,
-            self.content,
-            self.variant.go_name()
-        )?;
-        writeln!(f, "return json.Marshal(output)")
+            r#"
+                var output map[string]interface{{}}
+                output["{tag}"] = "{serialized_name}"
+                output["{content}"] = self.{variant_go_name}
+                return json.Marshal(output)
+            "#,
+            tag = self.tag,
+            serialized_name = self.variant.serialized_name,
+            content = self.content,
+            variant_go_name = self.variant.go_name()
+        }
     }
 }
+
+struct InternallyTaggedMarshaller<'a> {
+    tag: &'a str,
+    variant: &'a UnionVariant,
+}
+
+impl<'a> fmt::Display for InternallyTaggedMarshaller<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writedoc! {
+            f,
+            r#"
+                return json.Marshal(struct{{
+                	Tag string `json:"{tag}"`
+                	{variant_type}
+                }}{{
+                	Tag: "{serialized_name}",
+                	{variant_type}: *self.{variant_go_name}
+                }})
+            "#,
+            tag = self.tag,
+            serialized_name = self.variant.serialized_name,
+            variant_go_name = self.variant.go_name(),
+            variant_type = self.variant.ty.go_type()
+        }
+    }
+}
+
 // TODO: Adjacent needs {"t": "tag", "d": data}
 // Internal needs {"type": "tag", ..rest_fields}
 // External needs {"tag": {...}}
@@ -178,33 +217,47 @@ impl<'a> fmt::Display for UnionUnmarshal<'a> {
                 writeln!(f, "\treturn err")?;
                 writeln!(f, "}}")?;
                 for variant in &details.variants {
-                    writeln!(f, "if temp.Tag == \"{}\" {{", variant.serialized_name)?;
-                    writeln!(
-                        indented(f),
-                        "rv := struct{{\n\tData {} `json:\"{}\"`\n}}{{}}",
-                        variant.ty.go_type(),
-                        content,
-                    )?;
-                    writeln!(
-                        indented(f),
-                        "if err := json.Unmarshal(data, &rv); err != nil {{"
-                    )?;
-                    writeln!(indented(f), "\treturn err")?;
-                    writeln!(indented(f), "}}")?;
-                    writeln!(indented(f), "self.{} = &rv.Data", variant.go_name())?;
-                    for other_variant in &details.variants {
-                        if other_variant == variant {
-                            continue;
+                    write!(
+                        f,
+                        "{}",
+                        AdjacentlyTaggedVariantUnmarshaller {
+                            content,
+                            variant,
+                            all_variants: &details.variants
                         }
-                        writeln!(indented(f), "self.{} = nil", other_variant.go_name())?;
-                    }
-                    write!(f, "}} else ")?;
+                    )?;
                 }
                 writeln!(f, "{{")?;
                 writeln!(indented(f), "return errors.New(\"Unknown type tag\")")?;
                 writeln!(f, "}}")?;
                 writeln!(f, "return nil")?;
             }
+            UnionRepresentation::InternallyTagged { tag } => {
+                let f = &mut indented(f);
+                writeln!(
+                    f,
+                    "temp := struct{{\n\tTag string `json:\"{}\"`\n}}{{}}",
+                    tag
+                )?;
+                writeln!(f, "if err := json.Unmarshal(data, &temp); err != nil {{")?;
+                writeln!(f, "\treturn err")?;
+                writeln!(f, "}}")?;
+                for variant in &details.variants {
+                    write!(
+                        f,
+                        "{}",
+                        InternallyTaggedVariantUnmarshaller {
+                            variant,
+                            all_variants: &details.variants
+                        }
+                    )?;
+                }
+                writeln!(f, "{{")?;
+                writeln!(indented(f), "return errors.New(\"Unknown type tag\")")?;
+                writeln!(f, "}}")?;
+                writeln!(f, "return nil")?;
+            }
+
             _ => todo!("Support other enum representaitons"),
         }
         writeln!(f, "}}")?;
@@ -212,6 +265,69 @@ impl<'a> fmt::Display for UnionUnmarshal<'a> {
         // TODO: Support anything other than Adjacent tagging
         //todo!("Write UnionUnmarshal")
         Ok(())
+    }
+}
+
+struct AdjacentlyTaggedVariantUnmarshaller<'a> {
+    content: &'a str,
+    variant: &'a UnionVariant,
+    all_variants: &'a [UnionVariant],
+}
+
+impl<'a> fmt::Display for AdjacentlyTaggedVariantUnmarshaller<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "if temp.Tag == \"{}\" {{", self.variant.serialized_name)?;
+        writeln!(
+            indented(f),
+            "rv := struct{{\n\tData {} `json:\"{}\"`\n}}{{}}",
+            self.variant.ty.go_type(),
+            self.content,
+        )?;
+        writeln!(
+            indented(f),
+            "if err := json.Unmarshal(data, &rv); err != nil {{"
+        )?;
+        writeln!(indented(f), "\treturn err")?;
+        writeln!(indented(f), "}}")?;
+        writeln!(indented(f), "self.{} = &rv.Data", self.variant.go_name())?;
+        for other_variant in self.all_variants {
+            if other_variant == self.variant {
+                continue;
+            }
+            writeln!(indented(f), "self.{} = nil", other_variant.go_name())?;
+        }
+        write!(f, "}} else ")
+    }
+}
+
+struct InternallyTaggedVariantUnmarshaller<'a> {
+    variant: &'a UnionVariant,
+    all_variants: &'a [UnionVariant],
+}
+
+impl<'a> fmt::Display for InternallyTaggedVariantUnmarshaller<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writedoc!(
+            f,
+            r#"
+            if temp.Tag == "{serialized_name}" {{
+            	var rv {go_type}
+            	if err := json.Unmarshal(data, &rv); err != nil {{
+            		return err
+            	}}
+            	self.{go_name} = &rv
+            "#,
+            serialized_name = self.variant.serialized_name,
+            go_type = self.variant.ty.go_type(),
+            go_name = self.variant.go_name()
+        )?;
+        for other_variant in self.all_variants {
+            if other_variant == self.variant {
+                continue;
+            }
+            writeln!(indented(f), "self.{} = nil", other_variant.go_name())?;
+        }
+        write!(f, "}} else ")
     }
 }
 
