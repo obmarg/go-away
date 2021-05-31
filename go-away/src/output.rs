@@ -4,14 +4,14 @@ use indoc::writedoc;
 
 pub use super::types::*;
 
-pub enum GoType {
-    Struct(Struct),
-    NewType(NewType),
-    Enum(Enum),
-    Union(Union),
+pub enum GoType<'a> {
+    Struct(&'a Struct),
+    NewType(&'a NewType),
+    Enum(&'a Enum),
+    Union(&'a Union),
 }
 
-impl fmt::Display for GoType {
+impl<'a> fmt::Display for GoType<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match self {
             GoType::Struct(details) => {
@@ -361,7 +361,7 @@ mod tests {
     #[test]
     fn test_primitive_structs() {
         assert_snapshot!(
-            GoType::Struct(Struct {
+            GoType::Struct(&Struct {
                 name: "MyStruct".into(),
                 fields: vec![
                     Field {
@@ -400,7 +400,7 @@ mod tests {
 
     #[test]
     fn test_newtype_output() {
-        assert_snapshot!(GoType::NewType(NewType {
+        assert_snapshot!(GoType::NewType(&NewType {
             name: "UserId".into(),
             inner: FieldType::Primitive(Primitive::String),
         })
@@ -410,7 +410,7 @@ mod tests {
 
     #[test]
     fn test_enum_output() {
-        assert_snapshot!(GoType::Enum(Enum {
+        assert_snapshot!(GoType::Enum(&Enum {
             name: "FulfilmentType".into(),
             variants: vec![
                 EnumVariant {
@@ -435,7 +435,7 @@ mod tests {
 
     #[test]
     fn test_adjacently_tagged_union_output() {
-        assert_snapshot!(GoType::Union(Union {
+        assert_snapshot!(GoType::Union(&Union {
             name: "MyUnion".into(),
             representation: UnionRepresentation::AdjacentlyTagged {
                 tag: "type".into(),

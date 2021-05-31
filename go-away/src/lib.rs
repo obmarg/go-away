@@ -37,11 +37,13 @@
 mod metadata;
 mod output;
 mod registry;
+mod type_id;
 
 pub mod types;
 
 pub use metadata::TypeMetadata;
 pub use registry::TypeRegistry;
+pub use type_id::TypeId;
 
 pub use go_away_derive::TypeMetadata;
 
@@ -52,18 +54,33 @@ pub fn registry_to_output(registry: TypeRegistry) -> String {
     use std::fmt::Write;
 
     let mut output = String::new();
-    for st in registry.structs {
-        write!(&mut output, "{}", output::GoType::Struct(st)).unwrap();
+    for id in registry.structs {
+        let ty = registry.types.get(&id).unwrap();
+        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
     }
-    for en in registry.enums {
-        write!(&mut output, "{}", output::GoType::Enum(en)).unwrap();
+    for id in registry.enums {
+        let ty = registry.types.get(&id).unwrap();
+        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
     }
-    for un in registry.unions {
-        write!(&mut output, "{}", output::GoType::Union(un)).unwrap();
+    for id in registry.unions {
+        let ty = registry.types.get(&id).unwrap();
+        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
     }
-    for nt in registry.newtypes {
-        write!(&mut output, "{}", output::GoType::NewType(nt)).unwrap();
+    for id in registry.newtypes {
+        let ty = registry.types.get(&id).unwrap();
+        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
     }
 
     output
+}
+
+impl<'a> From<&'a registry::Type> for output::GoType<'a> {
+    fn from(ty: &'a registry::Type) -> Self {
+        match ty {
+            registry::Type::Struct(inner) => output::GoType::Struct(inner),
+            registry::Type::Enum(inner) => output::GoType::Enum(inner),
+            registry::Type::Union(inner) => output::GoType::Union(inner),
+            registry::Type::NewType(inner) => output::GoType::NewType(inner),
+        }
+    }
 }

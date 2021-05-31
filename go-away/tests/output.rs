@@ -100,3 +100,14 @@ fn lifetimes_and_strs() {
 
     assert_snapshot!(go_away::registry_to_output(registry));
 }
+
+#[test]
+fn type_deduplication() {
+    let mut registry = TypeRegistry::new();
+
+    // These both contain `Nested` so there should be one `Nested` type in the output
+    StructEnum::metadata(&mut registry);
+    MyData::metadata(&mut registry);
+
+    assert_snapshot!(go_away::registry_to_output(registry));
+}
