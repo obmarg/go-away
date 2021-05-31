@@ -53,6 +53,6 @@ func (self *NewTypeEnum) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
-type One float64
 type Two bool
+type One float64
 

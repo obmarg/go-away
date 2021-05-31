@@ -54,19 +54,19 @@ pub fn registry_to_output(registry: TypeRegistry) -> String {
     use std::fmt::Write;
 
     let mut output = String::new();
-    for id in registry.structs {
+    for id in registry.structs.into_iter().rev() {
         let ty = registry.types.get(&id).unwrap();
         write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
     }
-    for id in registry.enums {
+    for id in registry.unions.into_iter().rev() {
         let ty = registry.types.get(&id).unwrap();
         write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
     }
-    for id in registry.unions {
+    for id in registry.newtypes.into_iter().rev() {
         let ty = registry.types.get(&id).unwrap();
         write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
     }
-    for id in registry.newtypes {
+    for id in registry.enums.into_iter().rev() {
         let ty = registry.types.get(&id).unwrap();
         write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
     }
