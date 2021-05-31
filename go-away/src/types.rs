@@ -143,6 +143,7 @@ pub enum Primitive {
 #[derive(Debug, PartialEq, Eq)]
 pub struct TypeRef {
     pub(crate) name: String,
+    // TODO: id: std::any::TypeId,
 }
 
 impl TypeRef {

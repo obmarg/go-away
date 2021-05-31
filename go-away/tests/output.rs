@@ -87,6 +87,20 @@ fn test_internally_tagged_tuple_enum() {
     assert_snapshot!(go_away::registry_to_output(registry));
 }
 
+#[derive(TypeMetadata)]
+struct TypeWithLifetimes<'a, 'b> {
+    data: &'a str,
+    other: &'b str,
+}
+
+#[test]
+fn lifetimes_and_strs() {
+    let mut registry = TypeRegistry::new();
+    TypeWithLifetimes::metadata(&mut registry);
+
+    assert_snapshot!(go_away::registry_to_output(registry));
+}
+
 #[test]
 fn type_deduplication() {
     let mut registry = TypeRegistry::new();

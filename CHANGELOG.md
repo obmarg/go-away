@@ -14,6 +14,7 @@ all APIs might be changed.
 ### New Features
 
 - Internally tagged enums are now supported
+- `&str` fields are now supported
 - `go-away` now deduplicates types so if a given type appears in more than one
   place it should only result in one go type being output.
 
