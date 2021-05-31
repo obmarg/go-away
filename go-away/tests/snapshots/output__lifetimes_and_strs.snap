@@ -1,0 +1,10 @@
+---
+source: go-away/tests/output.rs
+expression: "go_away::registry_to_output(registry)"
+
+---
+type TypeWithLifetimes struct {
+	Data string `json:"data"`
+	Other string `json:"other"`
+}
+

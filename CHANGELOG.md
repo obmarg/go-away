@@ -14,6 +14,7 @@ all APIs might be changed.
 ### New Features
 
 - Internally tagged enums are now supported
+- `&str` fields are now supported
 
 ## v0.1.1 - 2021-05-26
 
