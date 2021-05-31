@@ -24,7 +24,6 @@ pub struct TypeRegistry {
     pub(super) newtypes: Vec<TypeId>,
 }
 
-// TODO: these methods maybe need to take/return some sort of UUID that identifies the type...
 impl TypeRegistry {
     /// Construct a new TypeRegistry
     pub fn new() -> Self {
