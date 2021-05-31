@@ -10,7 +10,7 @@
 //! Use is fairly simple:
 //!
 //! ```rust
-//! use go_away::TypeMetadata;
+//! use go_away::{TypeMetadata, TypeRegistry};
 //!
 //! // First, derive TypeMetadata on some types:
 //!
@@ -22,7 +22,7 @@
 //! // Then you can register this type inside a `TypeRegistry`
 //!
 //! let mut registry = TypeRegistry::new();
-//! MyType::metadata(&mut registy);
+//! MyType::metadata(&mut registry);
 //!
 //! // And get some go code to write out to a file:
 //! let go_code = go_away::registry_to_output(registry);
