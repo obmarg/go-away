@@ -11,6 +11,10 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+### New Features
+
+- Internally tagged enums are now supported
+
 ## v0.1.1 - 2021-05-26
 
 ### Changes
