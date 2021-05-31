@@ -18,6 +18,10 @@ all APIs might be changed.
 - `go-away` now deduplicates types so if a given type appears in more than one
   place it should only result in one go type being output.
 
+### Changes
+
+- Messed with the order of output a bit
+
 ## v0.1.1 - 2021-05-26
 
 ### Changes

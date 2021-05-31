@@ -3,29 +3,23 @@ source: go-away/tests/output.rs
 expression: "go_away::registry_to_output(registry)"
 
 ---
-type OptionOne struct {
-	X string `json:"x"`
-	Y int `json:"y"`
+type MyData struct {
+	FieldOne string `json:"field_one"`
+	Nested Nested `json:"nested"`
+}
+type OptionTwo struct {
+	Foo string `json:"foo"`
+	Bar Nested `json:"bar"`
 }
 type Nested struct {
 	AString string `json:"some_other_name"`
 	AnInt int `json:"an_int"`
 	FulfilmentType FulfilmentType `json:"fulfilment_type"`
 }
-type OptionTwo struct {
-	Foo string `json:"foo"`
-	Bar Nested `json:"bar"`
+type OptionOne struct {
+	X string `json:"x"`
+	Y int `json:"y"`
 }
-type MyData struct {
-	FieldOne string `json:"field_one"`
-	Nested Nested `json:"nested"`
-}
-type FulfilmentType string
-
-const (
-	Delivery FulfilmentType = "Delivery"
-	Collection FulfilmentType = "Collection"
-)
 type StructEnum struct {
 	*OptionOne
 	*OptionTwo
@@ -76,4 +70,10 @@ func (self *StructEnum) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
+type FulfilmentType string
+
+const (
+	Delivery FulfilmentType = "Delivery"
+	Collection FulfilmentType = "Collection"
+)
 
