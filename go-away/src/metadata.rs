@@ -49,6 +49,12 @@ impl TypeMetadata for String {
     }
 }
 
+impl TypeMetadata for str {
+    fn metadata(_: &mut TypeRegistry) -> FieldType {
+        FieldType::Primitive(Primitive::String)
+    }
+}
+
 impl TypeMetadata for bool {
     fn metadata(_: &mut TypeRegistry) -> FieldType {
         FieldType::Primitive(Primitive::Bool)
