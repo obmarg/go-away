@@ -1,4 +1,9 @@
-pub use super::types::{Enum, NewType, Struct, TypeRef, Union};
+pub use std::collections::HashMap;
+
+pub use super::{
+    types::{Enum, NewType, Struct, TypeRef, Union},
+    TypeId,
+};
 
 /// A registry of type details.
 ///
@@ -6,10 +11,17 @@ pub use super::types::{Enum, NewType, Struct, TypeRef, Union};
 /// to output types in other languages.
 #[derive(Default)]
 pub struct TypeRegistry {
-    pub(super) structs: Vec<Struct>,
-    pub(super) enums: Vec<Enum>,
-    pub(super) unions: Vec<Union>,
-    pub(super) newtypes: Vec<NewType>,
+    /// The master list of types
+    pub(super) types: HashMap<TypeId, Type>,
+
+    /// An ordered list of struct IDs, used to output in order.
+    pub(super) structs: Vec<TypeId>,
+    /// An ordered list of enum IDs, used to output in order.
+    pub(super) enums: Vec<TypeId>,
+    /// An ordered list of union IDs, used to output in order.
+    pub(super) unions: Vec<TypeId>,
+    /// An ordered list of newtype IDs, used to output in order.
+    pub(super) newtypes: Vec<TypeId>,
 }
 
 // TODO: these methods maybe need to take/return some sort of UUID that identifies the type...
@@ -20,30 +32,87 @@ impl TypeRegistry {
     }
 
     /// Register a `Struct`
-    pub fn register_struct(&mut self, details: Struct) -> TypeRef {
-        let name = details.name.clone();
-        self.structs.push(details);
-        TypeRef { name }
+    pub fn register_struct(&mut self, id: TypeId, details: Struct) -> TypeRef {
+        if !self.types.contains_key(&id) {
+            self.structs.push(id.clone());
+        }
+        self.register_type(id, Type::Struct(details))
     }
 
     /// Register a `NewType`
-    pub fn register_newtype(&mut self, details: NewType) -> TypeRef {
-        let name = details.name.clone();
-        self.newtypes.push(details);
-        TypeRef { name }
+    pub fn register_newtype(&mut self, id: TypeId, details: NewType) -> TypeRef {
+        if !self.types.contains_key(&id) {
+            self.newtypes.push(id.clone());
+        }
+        self.register_type(id, Type::NewType(details))
     }
 
     /// Register an `Enum`
-    pub fn register_enum(&mut self, details: Enum) -> TypeRef {
-        let name = details.name.clone();
-        self.enums.push(details);
-        TypeRef { name }
+    pub fn register_enum(&mut self, id: TypeId, details: Enum) -> TypeRef {
+        if !self.types.contains_key(&id) {
+            self.enums.push(id.clone());
+        }
+        self.register_type(id, Type::Enum(details))
     }
 
     /// Register a `Uninon`
-    pub fn register_union(&mut self, details: Union) -> TypeRef {
-        let name = details.name.clone();
-        self.unions.push(details);
-        TypeRef { name }
+    pub fn register_union(&mut self, id: TypeId, details: Union) -> TypeRef {
+        if !self.types.contains_key(&id) {
+            self.unions.push(id.clone());
+        }
+        self.register_type(id, Type::Union(details))
+    }
+
+    fn register_type(&mut self, id: TypeId, ty: Type) -> TypeRef {
+        if self.types.contains_key(&id) {
+            match self.types.get(&id) {
+                Some(existing) if ty.same_kind(&existing) => return existing.type_ref(),
+                other => panic!("Type register mismatch: {:?} vs {:?}", ty, other),
+            }
+        }
+
+        let type_ref = ty.type_ref();
+        self.types.insert(id, ty);
+
+        type_ref
+    }
+}
+
+#[derive(Debug)]
+#[allow(clippy::enum_variant_names)]
+pub(super) enum Type {
+    Struct(Struct),
+    Enum(Enum),
+    Union(Union),
+    NewType(NewType),
+}
+
+impl Type {
+    fn type_ref(&self) -> TypeRef {
+        match self {
+            Type::Struct(st) => TypeRef {
+                name: st.name.clone(),
+            },
+            Type::Enum(en) => TypeRef {
+                name: en.name.clone(),
+            },
+            Type::Union(un) => TypeRef {
+                name: un.name.clone(),
+            },
+            Type::NewType(nt) => TypeRef {
+                name: nt.name.clone(),
+            },
+        }
+    }
+
+    #[allow(clippy::match_like_matches_macro)]
+    fn same_kind(&self, other: &Type) -> bool {
+        match (self, other) {
+            (Type::Struct(_), Type::Struct(_)) => true,
+            (Type::Enum(_), Type::Enum(_)) => true,
+            (Type::Union(_), Type::Union(_)) => true,
+            (Type::NewType(_), Type::NewType(_)) => true,
+            _ => false,
+        }
     }
 }

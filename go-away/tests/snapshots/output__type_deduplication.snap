@@ -1,0 +1,79 @@
+---
+source: go-away/tests/output.rs
+expression: "go_away::registry_to_output(registry)"
+
+---
+type OptionOne struct {
+	X string `json:"x"`
+	Y int `json:"y"`
+}
+type Nested struct {
+	AString string `json:"some_other_name"`
+	AnInt int `json:"an_int"`
+	FulfilmentType FulfilmentType `json:"fulfilment_type"`
+}
+type OptionTwo struct {
+	Foo string `json:"foo"`
+	Bar Nested `json:"bar"`
+}
+type MyData struct {
+	FieldOne string `json:"field_one"`
+	Nested Nested `json:"nested"`
+}
+type FulfilmentType string
+
+const (
+	Delivery FulfilmentType = "Delivery"
+	Collection FulfilmentType = "Collection"
+)
+type StructEnum struct {
+	*OptionOne
+	*OptionTwo
+}
+
+func (self *StructEnum) MarshalJSON() ([]byte, error) {
+	if self.OptionOne != nil {
+		var output map[string]interface{}
+		output["type"] = "OptionOne"
+		output["data"] = self.OptionOne
+		return json.Marshal(output)
+	} else 	if self.OptionTwo != nil {
+		var output map[string]interface{}
+		output["type"] = "OptionTwo"
+		output["data"] = self.OptionTwo
+		return json.Marshal(output)
+	} else 	{
+		return json.Marshal(nil)
+	}
+}
+func (self *StructEnum) UnmarshalJSON(data []byte) error {
+	temp := struct{
+		Tag string `json:"type"`
+	}{}
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+	if temp.Tag == "OptionOne" {
+		rv := struct{
+			Data OptionOne `json:"data"`
+		}{}
+		if err := json.Unmarshal(data, &rv); err != nil {
+			return err
+		}
+		self.OptionOne = &rv.Data
+		self.OptionTwo = nil
+	} else if temp.Tag == "OptionTwo" {
+		rv := struct{
+			Data OptionTwo `json:"data"`
+		}{}
+		if err := json.Unmarshal(data, &rv); err != nil {
+			return err
+		}
+		self.OptionTwo = &rv.Data
+		self.OptionOne = nil
+	} else {
+		return errors.New("Unknown type tag")
+	}
+	return nil
+}
+

@@ -4,6 +4,7 @@
 /// A struct.
 ///
 /// This will be serialized as a JSON object.
+#[derive(Debug)]
 pub struct Struct {
     /// The name of the struct in Rust
     pub name: String,
@@ -13,6 +14,7 @@ pub struct Struct {
 }
 
 /// A field within a struct
+#[derive(Debug)]
 pub struct Field {
     /// The name of the field in rust.  If the field is un-named this will
     /// be a number.
@@ -27,6 +29,7 @@ pub struct Field {
 /// A newtype struct (e.g. `struct SomeId(String)`)
 ///
 /// These are usually represented as their inner type when serialized.
+#[derive(Debug)]
 pub struct NewType {
     /// The name of the struct in rust.
     pub name: String,
@@ -38,6 +41,7 @@ pub struct NewType {
 /// An enum - note that in go-away these do not contain data.
 ///
 /// A Rust enum that's variants contain values will go to a `UnionType`
+#[derive(Debug)]
 pub struct Enum {
     /// The name of the enum
     pub name: String,
@@ -47,6 +51,7 @@ pub struct Enum {
 
 /// An enum variant - note that these are just names and are serialized
 /// as strings.
+#[derive(Debug)]
 pub struct EnumVariant {
     /// The name of the variant in code.
     pub name: String,
@@ -57,6 +62,7 @@ pub struct EnumVariant {
 /// A union type - any rust enum that's variants contain data.
 ///
 /// These will be serialzied differently depending on the UnionRepresentation.
+#[derive(Debug)]
 pub struct Union {
     /// The name of the union
     pub name: String,
@@ -66,7 +72,7 @@ pub struct Union {
     pub variants: Vec<UnionVariant>,
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 /// A variant of a union type
 pub struct UnionVariant {
     /// The name of the variant if any
@@ -80,6 +86,7 @@ pub struct UnionVariant {
 /// The serialized representation of the union type
 ///
 /// See https://serde.rs/enum-representations.html for details
+#[derive(Debug)]
 pub enum UnionRepresentation {
     /// An adjacently tagged representation
     AdjacentlyTagged {
@@ -100,7 +107,7 @@ pub enum UnionRepresentation {
 }
 
 /// The type of a field.
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum FieldType {
     /// A `Option<T>` field
     Optional(Box<FieldType>),
@@ -120,7 +127,7 @@ pub enum FieldType {
 }
 
 /// The primitive types
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Primitive {
     /// Strings
     String,
@@ -133,7 +140,7 @@ pub enum Primitive {
 }
 
 /// A reference to a given named type
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct TypeRef {
     pub(crate) name: String,
 }

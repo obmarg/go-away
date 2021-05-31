@@ -1,11 +1,14 @@
 use proc_macro2::{Literal, TokenStream};
 use quote::quote;
-
 use serde_derive_internals::{
     ast::{Container, Data, Field, Style},
     attr::TagType,
     Ctxt,
 };
+
+mod type_id;
+
+use type_id::TypeIdCall;
 
 pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
     use quote::TokenStreamExt;
@@ -26,6 +29,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             return Ok(rv);
         }
     }
+    let type_id = TypeIdCall::for_struct(&container.ident, &container.generics);
 
     let ident = &container.ident;
     let name_literal = Literal::string(&ident.to_string());
@@ -50,7 +54,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             }
 
             inner.append_all(quote! {
-                FieldType::Named(registry.register_enum(rv))
+                FieldType::Named(registry.register_enum(#type_id, rv))
             });
         }
         Data::Enum(variants) if variants.iter().all(|v| matches!(v.style, Style::Newtype)) => {
@@ -77,7 +81,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
                 })
             }
             inner.append_all(quote! {
-                FieldType::Named(registry.register_union(rv))
+                FieldType::Named(registry.register_union(#type_id, rv))
             })
         }
         Data::Enum(variants) => {
@@ -92,7 +96,10 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             for variant in variants {
                 let variant_name = Literal::string(&variant.ident.to_string());
                 let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
-                let inner_type_block = struct_block(&variant.ident.to_string(), &variant.fields);
+                let type_id =
+                    TypeIdCall::for_variant(&container.ident, &variant.ident, &container.generics);
+                let inner_type_block =
+                    struct_block(&variant.ident.to_string(), &variant.fields, type_id);
                 inner.append_all(quote! {
                     rv.variants.push(
                         types::UnionVariant {
@@ -104,7 +111,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
                 })
             }
             inner.append_all(quote! {
-                FieldType::Named(registry.register_union(rv))
+                FieldType::Named(registry.register_union(#type_id, rv))
             })
         }
         Data::Struct(_, fields) => {
@@ -115,10 +122,10 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
                         name: #name_literal.to_string(),
                         inner: #metadata_call,
                     };
-                    FieldType::Named(registry.register_newtype(nt))
+                    FieldType::Named(registry.register_newtype(#type_id, nt))
                 })
             } else {
-                let struct_block_contents = struct_block(&ident.to_string(), &fields);
+                let struct_block_contents = struct_block(&ident.to_string(), &fields, type_id);
                 inner.append_all(quote! {
                     let type_ref = {
                         #struct_block_contents
@@ -141,7 +148,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
     })
 }
 
-fn struct_block(name: &str, fields: &[Field]) -> TokenStream {
+fn struct_block(name: &str, fields: &[Field], type_id: TypeIdCall<'_>) -> TokenStream {
     use quote::TokenStreamExt;
 
     let mut rv = TokenStream::new();
@@ -168,7 +175,7 @@ fn struct_block(name: &str, fields: &[Field]) -> TokenStream {
         });
     }
     rv.append_all(quote! {
-        registry.register_struct(st)
+        registry.register_struct(#type_id, st)
     });
 
     rv
