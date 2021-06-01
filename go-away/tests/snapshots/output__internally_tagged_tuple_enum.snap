@@ -4,8 +4,8 @@ expression: "go_away::registry_to_output(registry)"
 
 ---
 type InternallyTaggedTupleEnum struct {
-	*One
-	*Two
+	One *One
+	Two *Two
 }
 
 func (self *InternallyTaggedTupleEnum) MarshalJSON() ([]byte, error) {
@@ -15,7 +15,7 @@ func (self *InternallyTaggedTupleEnum) MarshalJSON() ([]byte, error) {
 			One
 		}{
 			Tag: "One",
-			One: *self.One
+			One: *self.One,
 		})
 	} else 	if self.Two != nil {
 		return json.Marshal(struct{
@@ -23,7 +23,7 @@ func (self *InternallyTaggedTupleEnum) MarshalJSON() ([]byte, error) {
 			Two
 		}{
 			Tag: "Two",
-			Two: *self.Two
+			Two: *self.Two,
 		})
 	} else 	{
 		return json.Marshal(nil)

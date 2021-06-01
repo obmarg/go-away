@@ -41,7 +41,12 @@ impl<'a> fmt::Display for GoType<'a> {
             GoType::Union(details) => {
                 writeln!(f, "type {} struct {{", details.name)?;
                 for variant in &details.variants {
-                    writeln!(indented(f), "*{}", variant.ty.go_type())?;
+                    writeln!(
+                        indented(f),
+                        "{} *{}",
+                        variant.go_name(),
+                        variant.ty.go_type()
+                    )?;
                 }
                 writeln!(f, "}}\n")?;
                 write!(f, "{}", UnionMarshal(&details))?;
@@ -182,7 +187,7 @@ impl<'a> fmt::Display for InternallyTaggedMarshaller<'a> {
                 	{variant_type}
                 }}{{
                 	Tag: "{serialized_name}",
-                	{variant_type}: *self.{variant_go_name}
+                	{variant_type}: *self.{variant_go_name},
                 }})
             "#,
             tag = self.tag,
