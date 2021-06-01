@@ -18,6 +18,11 @@ all APIs might be changed.
 - `go-away` now deduplicates types so if a given type appears in more than one
   place it should only result in one go type being output.
 
+### Bug Fixes
+
+- Go union type output is now more likely to compile (it didn't at all prior to
+  this)
+
 ### Changes
 
 - Messed with the order of output a bit

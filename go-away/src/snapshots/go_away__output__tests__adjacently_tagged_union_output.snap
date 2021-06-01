@@ -1,11 +1,11 @@
 ---
 source: go-away/src/output.rs
-expression: "GoType::Union(Union{name: \"MyUnion\".into(),\n                    representation:\n                        UnionRepresentation::AdjacentlyTagged{tag:\n                                                                  \"type\".into(),\n                                                              content:\n                                                                  \"data\".into(),},\n                    variants:\n                        vec![UnionVariant\n                             {\n                                 name : Some(\"VarOne\" . into()), ty :\n                                 FieldType ::\n                                 Named(TypeRef { name : \"VarOne\" . into() }),\n                                 serialized_name : \"VAR_ONE\" . into(),\n                             }, UnionVariant\n                             {\n                                 name : Some(\"VarTwo\" . into()), ty :\n                                 FieldType ::\n                                 Named(TypeRef { name : \"VarTwo\" . into() }),\n                                 serialized_name : \"VAR_TWO\" . into(),\n                             }],}).to_string()"
+expression: "GoType::Union(&Union{name: \"MyUnion\".into(),\n                     representation:\n                         UnionRepresentation::AdjacentlyTagged{tag:\n                                                                   \"type\".into(),\n                                                               content:\n                                                                   \"data\".into(),},\n                     variants:\n                         vec![UnionVariant\n                              {\n                                  name : Some(\"VarOne\" . into()), ty :\n                                  FieldType ::\n                                  Named(TypeRef { name : \"VarOne\" . into() }),\n                                  serialized_name : \"VAR_ONE\" . into(),\n                              }, UnionVariant\n                              {\n                                  name : Some(\"VarTwo\" . into()), ty :\n                                  FieldType ::\n                                  Named(TypeRef { name : \"VarTwo\" . into() }),\n                                  serialized_name : \"VAR_TWO\" . into(),\n                              }],}).to_string()"
 
 ---
 type MyUnion struct {
-	*VarOne
-	*VarTwo
+	VarOne *VarOne
+	VarTwo *VarTwo
 }
 
 func (self *MyUnion) MarshalJSON() ([]byte, error) {

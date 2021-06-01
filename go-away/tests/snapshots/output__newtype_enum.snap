@@ -4,8 +4,8 @@ expression: "go_away::registry_to_output(registry)"
 
 ---
 type NewTypeEnum struct {
-	*One
-	*Two
+	OptionOne *One
+	OptionTwo *Two
 }
 
 func (self *NewTypeEnum) MarshalJSON() ([]byte, error) {

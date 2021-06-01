@@ -21,8 +21,8 @@ type OptionOne struct {
 	Y int `json:"y"`
 }
 type StructEnum struct {
-	*OptionOne
-	*OptionTwo
+	OptionOne *OptionOne
+	OptionTwo *OptionTwo
 }
 
 func (self *StructEnum) MarshalJSON() ([]byte, error) {
