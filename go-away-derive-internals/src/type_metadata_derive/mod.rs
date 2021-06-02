@@ -114,25 +114,24 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
                 FieldType::Named(registry.register_union(#type_id, rv))
             })
         }
+        Data::Struct(Style::Newtype, fields) => {
+            let metadata_call = metadata_call(fields.first().unwrap().ty);
+            inner.append_all(quote! {
+                let nt = types::NewType {
+                    name: #name_literal.to_string(),
+                    inner: #metadata_call,
+                };
+                FieldType::Named(registry.register_newtype(#type_id, nt))
+            });
+        }
         Data::Struct(_, fields) => {
-            if fields.len() == 1 {
-                let metadata_call = metadata_call(fields.first().unwrap().ty);
-                inner.append_all(quote! {
-                    let nt = types::NewType {
-                        name: #name_literal.to_string(),
-                        inner: #metadata_call,
-                    };
-                    FieldType::Named(registry.register_newtype(#type_id, nt))
-                })
-            } else {
-                let struct_block_contents = struct_block(&ident.to_string(), &fields, type_id);
-                inner.append_all(quote! {
-                    let type_ref = {
-                        #struct_block_contents
-                    };
-                    FieldType::Named(type_ref)
-                })
-            }
+            let struct_block_contents = struct_block(&ident.to_string(), &fields, type_id);
+            inner.append_all(quote! {
+                let type_ref = {
+                    #struct_block_contents
+                };
+                FieldType::Named(type_ref)
+            });
         }
     }
 
@@ -239,6 +238,22 @@ mod tests {
             struct MyData {
                 field_one: String,
                 field_two: String
+            }
+        }))
+    }
+
+    #[test]
+    fn test_newtype_struct() {
+        assert_snapshot!(test_conversion(quote! {
+            struct MyData(String);
+        }))
+    }
+
+    #[test]
+    fn test_struct_with_single_field() {
+        assert_snapshot!(test_conversion(quote! {
+            struct MyData {
+                data: String
             }
         }))
     }
