@@ -11,6 +11,10 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+### Breaking Changes
+
+- Enums variant constants now prefixed with their type name to avoid clashes.
+
 ### New Features
 
 - Internally tagged enums are now supported
