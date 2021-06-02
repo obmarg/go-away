@@ -3,6 +3,12 @@ source: go-away/tests/output.rs
 expression: "go_away::registry_to_output(registry)"
 
 ---
+type Two struct {
+	Y bool `json:"y"`
+}
+type One struct {
+	X float64 `json:"x"`
+}
 type InternallyTaggedTupleEnum struct {
 	One *One
 	Two *Two
@@ -55,6 +61,4 @@ func (self *InternallyTaggedTupleEnum) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
-type Two bool
-type One float64
 

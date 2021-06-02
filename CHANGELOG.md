@@ -22,6 +22,7 @@ all APIs might be changed.
 
 - Go union type output is now more likely to compile (it didn't at all prior to
   this)
+- Single field structs are no longer considered newtypes
 
 ### Changes
 
