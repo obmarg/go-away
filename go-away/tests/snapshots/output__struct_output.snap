@@ -15,7 +15,7 @@ type Nested struct {
 type FulfilmentType string
 
 const (
-	Delivery FulfilmentType = "Delivery"
-	Collection FulfilmentType = "Collection"
+	FulfilmentType_Delivery FulfilmentType = "Delivery"
+	FulfilmentType_Collection FulfilmentType = "Collection"
 )
 
