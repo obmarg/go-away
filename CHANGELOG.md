@@ -21,12 +21,14 @@ all APIs might be changed.
 - `&str` fields are now supported
 - `go-away` now deduplicates types so if a given type appears in more than one
   place it should only result in one go type being output.
+- The go output is now tested, so should work better
 
 ### Bug Fixes
 
 - Go union type output is now more likely to compile (it didn't at all prior to
   this)
 - Single field structs are no longer considered newtypes
+- Go marshalling now works (it had bugs previously)
 
 ### Changes
 
