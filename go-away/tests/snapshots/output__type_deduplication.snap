@@ -25,14 +25,14 @@ type StructEnum struct {
 	OptionTwo *OptionTwo
 }
 
-func (self *StructEnum) MarshalJSON() ([]byte, error) {
+func (self StructEnum) MarshalJSON() ([]byte, error) {
 	if self.OptionOne != nil {
-		var output map[string]interface{}
+		output := make(map[string]interface{})
 		output["type"] = "OptionOne"
 		output["data"] = self.OptionOne
 		return json.Marshal(output)
 	} else 	if self.OptionTwo != nil {
-		var output map[string]interface{}
+		output := make(map[string]interface{})
 		output["type"] = "OptionTwo"
 		output["data"] = self.OptionTwo
 		return json.Marshal(output)

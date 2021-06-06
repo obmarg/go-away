@@ -14,7 +14,7 @@ type InternallyTaggedTupleEnum struct {
 	Two *Two
 }
 
-func (self *InternallyTaggedTupleEnum) MarshalJSON() ([]byte, error) {
+func (self InternallyTaggedTupleEnum) MarshalJSON() ([]byte, error) {
 	if self.One != nil {
 		return json.Marshal(struct{
 			Tag string `json:"type"`
