@@ -11,6 +11,8 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+## v0.2.0 - 2021-06-06
+
 ### Breaking Changes
 
 - Enums variant constants now prefixed with their type name to avoid clashes.

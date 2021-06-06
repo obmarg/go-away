@@ -1,6 +1,6 @@
 [package]
 name = "go-away-derive"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Graeme Coupar <graeme@polyandglot.dev>"]
 edition = "2018"
 license = "MPL-2.0"
@@ -15,4 +15,4 @@ proc-macro = true
 
 [dependencies]
 syn = "1.0"
-go-away-derive-internals = { path = "../go-away-derive-internals", version = "0.1.1" }
+go-away-derive-internals = { path = "../go-away-derive-internals", version = "0.2.0" }
