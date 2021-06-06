@@ -53,6 +53,8 @@ dependencies = [
  "indenter",
  "indoc",
  "insta",
+ "serde",
+ "serde_json",
  "uuid",
 ]
 

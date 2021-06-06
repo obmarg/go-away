@@ -97,7 +97,7 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
         let details = self.0;
         writeln!(
             f,
-            "func (self *{}) MarshalJSON() ([]byte, error) {{",
+            "func (self {}) MarshalJSON() ([]byte, error) {{",
             details.name
         )?;
         for variant in details.variants.iter() {
@@ -160,7 +160,7 @@ impl<'a> fmt::Display for AdjacentlyTaggedMarshaller<'a> {
         writedoc! {
             f,
             r#"
-                var output map[string]interface{{}}
+                output := make(map[string]interface{{}})
                 output["{tag}"] = "{serialized_name}"
                 output["{content}"] = self.{variant_go_name}
                 return json.Marshal(output)
