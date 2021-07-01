@@ -73,7 +73,7 @@ func (self *StructEnum) UnmarshalJSON(data []byte) error {
 type FulfilmentType string
 
 const (
-	FulfilmentType_Delivery FulfilmentType = "Delivery"
-	FulfilmentType_Collection FulfilmentType = "Collection"
+	FulfilmentTypeDelivery FulfilmentType = "Delivery"
+	FulfilmentTypeCollection FulfilmentType = "Collection"
 )
 

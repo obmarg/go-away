@@ -30,7 +30,7 @@ impl<'a> fmt::Display for GoType<'a> {
                 for variant in &details.variants {
                     writeln!(
                         indented(f),
-                        "{}_{} {} = \"{}\"",
+                        "{}{} {} = \"{}\"",
                         details.name,
                         variant.name,
                         details.name,
@@ -433,8 +433,8 @@ mod tests {
         type FulfilmentType string
 
         const (
-        	FulfilmentType_Delivery FulfilmentType = "DELIVERY"
-        	FulfilmentType_Collection FulfilmentType = "COLLECTION"
+        	FulfilmentTypeDelivery FulfilmentType = "DELIVERY"
+        	FulfilmentTypeCollection FulfilmentType = "COLLECTION"
         )
         "###);
     }
