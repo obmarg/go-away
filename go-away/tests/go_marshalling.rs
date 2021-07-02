@@ -12,6 +12,9 @@ use serde::{Deserialize, Serialize};
 
 use go_away::{registry_to_output, TypeMetadata, TypeRegistry};
 
+#[cfg(feature = "chrono")]
+use chrono::{DateTime, NaiveDateTime, Utc};
+
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type")]
 enum InternallyTaggedTupleEnum {
@@ -48,6 +51,13 @@ enum StructEnum {
     OptionTwo { foo: String, bar: Nested },
 }
 
+#[cfg(feature = "chrono")]
+#[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "type")]
+enum DateTimeEnum {
+    One { a: DateTime<chrono::Utc> },
+}
+
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 struct Nested {
     #[serde(rename = "some_other_name")]
@@ -60,6 +70,18 @@ struct Nested {
 enum FulfilmentType {
     Delivery,
     Collection,
+}
+
+#[cfg(feature = "chrono")]
+#[test]
+fn test_datetime() {
+    run_test(
+        "datetime",
+        "DateTimeEnum",
+        &[DateTimeEnum::One {
+            a: DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(61, 0), Utc),
+        }],
+    );
 }
 
 #[test]
@@ -114,11 +136,14 @@ where
 			"log"
 			"io"
 			"fmt"
+			"time"
 		)
 
 		{}
 
 		func main() {{
+		    // this is so that go compiler does not complain if time is not used
+		    time.Now()
 			var input {}
 			dec := json.NewDecoder(os.Stdin)
 			for {{
@@ -157,6 +182,10 @@ where
     stdin.flush().unwrap();
 
     let output = process.wait_with_output().unwrap();
+
+    // Uncomment if you wish to output the result of the process
+    // println!("{}", String::from_utf8_lossy(&output.stdout));
+    // println!("{}", String::from_utf8_lossy(&output.stderr));
     assert!(output.status.success());
 
     let output = String::from_utf8(output.stdout).unwrap();

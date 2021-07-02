@@ -137,6 +137,8 @@ pub enum Primitive {
     Int,
     /// Booleans
     Bool,
+    /// Time
+    Time,
 }
 
 /// A reference to a given named type
