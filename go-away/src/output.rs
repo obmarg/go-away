@@ -85,6 +85,7 @@ impl FieldType {
             FieldType::Primitive(Primitive::Float) => "float64".to_string(),
             FieldType::Primitive(Primitive::Int) => "int".to_string(),
             FieldType::Primitive(Primitive::Bool) => "bool".to_string(),
+            FieldType::Primitive(Primitive::Time) => "time.Time".to_string(),
         }
     }
 }

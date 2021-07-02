@@ -71,7 +71,7 @@ impl TypeMetadata for uuid::Uuid {
 #[cfg(feature = "chrono")]
 impl<Tz: chrono::offset::TimeZone> TypeMetadata for chrono::DateTime<Tz> {
     fn metadata(_: &mut TypeRegistry) -> FieldType {
-        FieldType::Primitive(Primitive::String)
+        FieldType::Primitive(Primitive::Time)
     }
 }
 
