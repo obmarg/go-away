@@ -11,6 +11,8 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+## v0.3.0 - 2021-07-02
+
 ### Breaking Changes
 
 - Enum variant constants no longer contain underscores.
