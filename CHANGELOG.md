@@ -14,6 +14,7 @@ all APIs might be changed.
 ### Breaking Changes
 
 - Enum variant constants no longer contain underscores.
+- `chrono::DateTime<Utc>` is now translated to `time.Time` rather than `String`
 
 ## v0.2.0 - 2021-06-06
 
