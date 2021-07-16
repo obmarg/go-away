@@ -1,5 +1,6 @@
 use std::{fmt, fmt::Write};
 
+use indenter::indented;
 use indoc::writedoc;
 
 mod tabify;
@@ -367,10 +368,6 @@ fn to_pascal_case(s: &str) -> String {
         }
     }
     buf
-}
-
-pub fn indented<D: fmt::Write>(f: &mut D) -> indenter::Indented<'_, D> {
-    indenter::indented(f).with_str("\t")
 }
 
 #[cfg(test)]

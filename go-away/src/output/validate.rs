@@ -31,7 +31,7 @@ impl<'a> fmt::Display for UnionValidate<'a> {
             indented(f),
             r#"
             if count != 1 {{
-                 return fmt.Errorf("one variant must be populated, found %d", count)
+                return fmt.Errorf("one variant must be populated, found %d", count)
             }}
 
             return nil
@@ -81,21 +81,21 @@ mod tests {
         .to_string(),
         @r###"
         func (u MyUnion) Validate() error {
-        	var count int
+            var count int
 
-        	if u.VarOne != nil {
-        		count++
-        	}
+            if u.VarOne != nil {
+                count++
+            }
 
-        	if u.VarTwo != nil {
-        		count++
-        	}
+            if u.VarTwo != nil {
+                count++
+            }
 
-        	if count != 1 {
-        		return fmt.Errorf("one variant must be populated, found %d", count)
-        	}
+            if count != 1 {
+                return fmt.Errorf("one variant must be populated, found %d", count)
+            }
 
-        	return nil
+            return nil
         }
         "###
         );
