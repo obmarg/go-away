@@ -23,19 +23,19 @@ impl<'a> fmt::Display for UnionValidate<'a> {
                         count++
                     }}
 
-				"#,
+                    "#,
                 variant_name = variant.go_name()
             )?;
         }
         writedoc!(
             indented(f),
             r#"
-            if count != 1 {{
-                return fmt.Errorf("one variant must be populated, found %d", count)
-            }}
+                if count != 1 {{
+                    return fmt.Errorf("one variant must be populated, found %d", count)
+                }}
 
-            return nil
-			"#
+                return nil
+            "#
         )?;
         writeln!(f, "}}")
     }
