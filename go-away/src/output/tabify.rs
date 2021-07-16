@@ -4,7 +4,7 @@ use std::fmt::{Result, Write};
 ///
 /// This allows us to write templates like we're writing rust but have the output be tabbed,
 /// as is idiomatic in go.
-pub fn tabify<'a, D: ?Sized>(inner: &'a mut D) -> Tabify<'a, D> {
+pub fn tabify<D: ?Sized>(inner: &'_ mut D) -> Tabify<'_, D> {
     Tabify { inner }
 }
 
