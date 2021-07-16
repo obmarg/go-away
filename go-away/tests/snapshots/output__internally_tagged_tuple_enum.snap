@@ -15,6 +15,9 @@ type InternallyTaggedTupleEnum struct {
 }
 
 func (self InternallyTaggedTupleEnum) MarshalJSON() ([]byte, error) {
+	if err := self.Validate(); err != nil {
+		return nil, fmt.Errorf("Validate Failed: %w", err)
+	}
 	if self.One != nil {
 		return json.Marshal(struct{
 			Tag string `json:"type"`
@@ -32,7 +35,7 @@ func (self InternallyTaggedTupleEnum) MarshalJSON() ([]byte, error) {
 			Two: *self.Two,
 		})
 	} else 	{
-		return json.Marshal(nil)
+		return nil, fmt.Errorf("No variant was present")
 	}
 }
 func (self *InternallyTaggedTupleEnum) UnmarshalJSON(data []byte) error {
@@ -59,6 +62,23 @@ func (self *InternallyTaggedTupleEnum) UnmarshalJSON(data []byte) error {
 	} else {
 		return errors.New("Unknown type tag")
 	}
+	return nil
+}
+func (u InternallyTaggedTupleEnum) Validate() error {
+	var count int
+
+	if u.One != nil {
+		count++
+	}
+
+	if u.Two != nil {
+		count++
+	}
+
+	if count != 1 {
+		return fmt.Errorf("one variant must be populated, found %d", count)
+	}
+
 	return nil
 }
 

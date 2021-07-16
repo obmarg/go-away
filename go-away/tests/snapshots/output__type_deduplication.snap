@@ -26,6 +26,9 @@ type StructEnum struct {
 }
 
 func (self StructEnum) MarshalJSON() ([]byte, error) {
+	if err := self.Validate(); err != nil {
+		return nil, fmt.Errorf("Validate Failed: %w", err)
+	}
 	if self.OptionOne != nil {
 		output := make(map[string]interface{})
 		output["type"] = "OptionOne"
@@ -37,7 +40,7 @@ func (self StructEnum) MarshalJSON() ([]byte, error) {
 		output["data"] = self.OptionTwo
 		return json.Marshal(output)
 	} else 	{
-		return json.Marshal(nil)
+		return nil, fmt.Errorf("No variant was present")
 	}
 }
 func (self *StructEnum) UnmarshalJSON(data []byte) error {
@@ -68,6 +71,23 @@ func (self *StructEnum) UnmarshalJSON(data []byte) error {
 	} else {
 		return errors.New("Unknown type tag")
 	}
+	return nil
+}
+func (u StructEnum) Validate() error {
+	var count int
+
+	if u.OptionOne != nil {
+		count++
+	}
+
+	if u.OptionTwo != nil {
+		count++
+	}
+
+	if count != 1 {
+		return fmt.Errorf("one variant must be populated, found %d", count)
+	}
+
 	return nil
 }
 type FulfilmentType string

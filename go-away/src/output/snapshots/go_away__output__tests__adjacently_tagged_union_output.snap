@@ -9,6 +9,9 @@ type MyUnion struct {
 }
 
 func (self MyUnion) MarshalJSON() ([]byte, error) {
+	if err := self.Validate(); err != nil {
+		return nil, fmt.Errorf("Validate Failed: %w", err)
+	}
 	if self.VarOne != nil {
 		output := make(map[string]interface{})
 		output["type"] = "VAR_ONE"
@@ -20,7 +23,7 @@ func (self MyUnion) MarshalJSON() ([]byte, error) {
 		output["data"] = self.VarTwo
 		return json.Marshal(output)
 	} else 	{
-		return json.Marshal(nil)
+		return nil, fmt.Errorf("No variant was present")
 	}
 }
 func (self *MyUnion) UnmarshalJSON(data []byte) error {
@@ -51,6 +54,23 @@ func (self *MyUnion) UnmarshalJSON(data []byte) error {
 	} else {
 		return errors.New("Unknown type tag")
 	}
+	return nil
+}
+func (u MyUnion) Validate() error {
+	var count int
+
+	if u.VarOne != nil {
+		count++
+	}
+
+	if u.VarTwo != nil {
+		count++
+	}
+
+	if count != 1 {
+		return fmt.Errorf("one variant must be populated, found %d", count)
+	}
+
 	return nil
 }
 

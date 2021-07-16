@@ -3,6 +3,9 @@ use std::{fmt, fmt::Write};
 use indoc::writedoc;
 
 mod tabify;
+mod validate;
+
+use crate::output::validate::UnionValidate;
 
 pub use super::types::*;
 
@@ -55,6 +58,7 @@ impl<'a> fmt::Display for GoType<'a> {
                 writeln!(f, "}}\n")?;
                 write!(f, "{}", UnionMarshal(&details))?;
                 write!(f, "{}", UnionUnmarshal(&details))?;
+                write!(f, "{}", UnionValidate(&details))?;
             }
         }
 
@@ -99,9 +103,14 @@ struct UnionUnmarshal<'a>(&'a Union);
 impl<'a> fmt::Display for UnionMarshal<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let details = self.0;
-        writeln!(
+        writedoc!(
             f,
-            "func (self {}) MarshalJSON() ([]byte, error) {{",
+            r#"
+                func (self {}) MarshalJSON() ([]byte, error) {{
+                    if err := self.Validate(); err != nil {{
+                        return nil, fmt.Errorf("Validate Failed: %w", err)
+                    }}
+            "#,
             details.name
         )?;
         for variant in details.variants.iter() {
@@ -135,7 +144,10 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
             write!(f, " else ")?;
         }
         writeln!(indented(f), "{{")?;
-        writeln!(indented(f), "\treturn json.Marshal(nil)")?;
+        writeln!(
+            indented(f),
+            "\treturn nil, fmt.Errorf(\"No variant was present\")"
+        )?;
         writeln!(indented(f), "}}")?;
         writeln!(f, "}}")?;
 
