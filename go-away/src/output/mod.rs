@@ -2,6 +2,8 @@ use std::{fmt, fmt::Write};
 
 use indoc::writedoc;
 
+mod tabify;
+
 pub use super::types::*;
 
 pub enum GoType<'a> {
@@ -13,6 +15,7 @@ pub enum GoType<'a> {
 
 impl<'a> fmt::Display for GoType<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+        let f = &mut tabify::tabify(f);
         match self {
             GoType::Struct(details) => {
                 writeln!(f, "type {} struct {{", details.name)?;
@@ -185,11 +188,11 @@ impl<'a> fmt::Display for InternallyTaggedMarshaller<'a> {
             f,
             r#"
                 return json.Marshal(struct{{
-                	Tag string `json:"{tag}"`
-                	{variant_type}
+                    Tag string `json:"{tag}"`
+                    {variant_type}
                 }}{{
-                	Tag: "{serialized_name}",
-                	{variant_type}: *self.{variant_go_name},
+                    Tag: "{serialized_name}",
+                    {variant_type}: *self.{variant_go_name},
                 }})
             "#,
             tag = self.tag,
@@ -318,11 +321,11 @@ impl<'a> fmt::Display for InternallyTaggedVariantUnmarshaller<'a> {
             f,
             r#"
             if temp.Tag == "{serialized_name}" {{
-            	var rv {go_type}
-            	if err := json.Unmarshal(data, &rv); err != nil {{
-            		return err
-            	}}
-            	self.{go_name} = &rv
+                var rv {go_type}
+                if err := json.Unmarshal(data, &rv); err != nil {{
+                    return err
+                }}
+                self.{go_name} = &rv
             "#,
             serialized_name = self.variant.serialized_name,
             go_type = self.variant.ty.go_type(),
