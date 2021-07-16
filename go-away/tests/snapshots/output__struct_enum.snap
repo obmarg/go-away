@@ -37,14 +37,14 @@ func (self StructEnum) MarshalJSON() ([]byte, error) {
 	}
 }
 func (self *StructEnum) UnmarshalJSON(data []byte) error {
-	temp := struct{
+	temp := struct {
 		Tag string `json:"type"`
 	}{}
 	if err := json.Unmarshal(data, &temp); err != nil {
 		return err
 	}
 	if temp.Tag == "OptionOne" {
-		rv := struct{
+		rv := struct {
 			Data OptionOne `json:"data"`
 		}{}
 		if err := json.Unmarshal(data, &rv); err != nil {
@@ -53,7 +53,7 @@ func (self *StructEnum) UnmarshalJSON(data []byte) error {
 		self.OptionOne = &rv.Data
 		self.OptionTwo = nil
 	} else if temp.Tag == "OptionTwo" {
-		rv := struct{
+		rv := struct {
 			Data OptionTwo `json:"data"`
 		}{}
 		if err := json.Unmarshal(data, &rv); err != nil {

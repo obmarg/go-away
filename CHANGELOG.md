@@ -11,6 +11,10 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+### Bug Fixes
+
+- Improved some of the clearly wrong formatting on the output code
+
 ## v0.3.0 - 2021-07-02
 
 ### Breaking Changes
