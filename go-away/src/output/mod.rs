@@ -217,7 +217,7 @@ impl<'a> fmt::Display for UnionUnmarshal<'a> {
                 let f = &mut indented(f);
                 writeln!(
                     f,
-                    "temp := struct{{\n\tTag string `json:\"{}\"`\n}}{{}}",
+                    "temp := struct {{\n\tTag string `json:\"{}\"`\n}}{{}}",
                     tag
                 )?;
                 writeln!(f, "if err := json.Unmarshal(data, &temp); err != nil {{")?;
@@ -286,7 +286,7 @@ impl<'a> fmt::Display for AdjacentlyTaggedVariantUnmarshaller<'a> {
         writeln!(f, "if temp.Tag == \"{}\" {{", self.variant.serialized_name)?;
         writeln!(
             indented(f),
-            "rv := struct{{\n\tData {} `json:\"{}\"`\n}}{{}}",
+            "rv := struct {{\n\tData {} `json:\"{}\"`\n}}{{}}",
             self.variant.ty.go_type(),
             self.content,
         )?;
