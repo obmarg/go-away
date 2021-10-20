@@ -204,7 +204,7 @@ fn tag_to_representation(tag: &TagType) -> proc_macro2::TokenStream {
             }
         }
         TagType::None => {
-            quote! { types::UnionRepresentaiton::Untagged }
+            quote! { types::UnionRepresentation::Untagged }
         }
     }
 }
