@@ -38,6 +38,7 @@ mod metadata;
 mod output;
 mod registry;
 mod type_id;
+mod typescript_output;
 
 pub mod types;
 
@@ -81,6 +82,64 @@ impl<'a> From<&'a registry::Type> for output::GoType<'a> {
             registry::Type::Enum(inner) => output::GoType::Enum(inner),
             registry::Type::Union(inner) => output::GoType::Union(inner),
             registry::Type::NewType(inner) => output::GoType::NewType(inner),
+        }
+    }
+}
+
+/// Generates go ocde for all the types in the TypeRegistry
+///
+/// Note that this is a WIP API and is likely to be ditched/changed in future releases.
+pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
+    use std::fmt::Write;
+
+    let mut output = String::new();
+    for id in registry.structs.into_iter().rev() {
+        let ty = registry.types.get(&id).unwrap();
+        write!(
+            &mut output,
+            "{}",
+            typescript_output::TypeScriptType::from(ty)
+        )
+        .unwrap();
+    }
+    for id in registry.unions.into_iter().rev() {
+        let ty = registry.types.get(&id).unwrap();
+        write!(
+            &mut output,
+            "{}",
+            typescript_output::TypeScriptType::from(ty)
+        )
+        .unwrap();
+    }
+    for id in registry.newtypes.into_iter().rev() {
+        let ty = registry.types.get(&id).unwrap();
+        write!(
+            &mut output,
+            "{}",
+            typescript_output::TypeScriptType::from(ty)
+        )
+        .unwrap();
+    }
+    for id in registry.enums.into_iter().rev() {
+        let ty = registry.types.get(&id).unwrap();
+        write!(
+            &mut output,
+            "{}",
+            typescript_output::TypeScriptType::from(ty)
+        )
+        .unwrap();
+    }
+
+    output
+}
+
+impl<'a> From<&'a registry::Type> for typescript_output::TypeScriptType<'a> {
+    fn from(ty: &'a registry::Type) -> Self {
+        match ty {
+            registry::Type::Struct(inner) => typescript_output::TypeScriptType::Struct(inner),
+            registry::Type::Enum(inner) => typescript_output::TypeScriptType::Enum(inner),
+            registry::Type::Union(inner) => typescript_output::TypeScriptType::Union(inner),
+            registry::Type::NewType(inner) => typescript_output::TypeScriptType::NewType(inner),
         }
     }
 }

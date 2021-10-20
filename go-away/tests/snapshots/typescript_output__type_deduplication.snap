@@ -1,0 +1,28 @@
+---
+source: go-away/tests/typescript_output.rs
+expression: "go_away::registry_to_typescript_output(registry)"
+
+---
+type MyData = {
+	field_one: string;
+	nested: Nested;
+}
+type OptionTwo = {
+	foo: string;
+	bar: Nested;
+}
+type Nested = {
+	some_other_name: string;
+	an_int: number;
+	fulfilment_type: FulfilmentType;
+}
+type OptionOne = {
+	x: string;
+	y: number;
+}
+type StructEnum = OptionOne | OptionTwo;
+enum FulfilmentType {
+	Delivery = "Delivery",
+	Collection = "Collection",
+}
+

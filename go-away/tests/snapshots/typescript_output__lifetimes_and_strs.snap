@@ -1,0 +1,10 @@
+---
+source: go-away/tests/typescript_output.rs
+expression: "go_away::registry_to_typescript_output(registry)"
+
+---
+type TypeWithLifetimes = {
+	data: string;
+	other: string;
+}
+
