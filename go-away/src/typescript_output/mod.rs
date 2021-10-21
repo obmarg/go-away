@@ -126,8 +126,8 @@ impl FieldType {
             FieldType::Primitive(Primitive::String) => "string".to_string(),
             FieldType::Primitive(Primitive::Float) => "number".to_string(),
             FieldType::Primitive(Primitive::Int) => "number".to_string(),
-            FieldType::Primitive(Primitive::Bool) => "bool".to_string(),
-            FieldType::Primitive(Primitive::Time) => "time.Time".to_string(),
+            FieldType::Primitive(Primitive::Bool) => "boolean".to_string(),
+            FieldType::Primitive(Primitive::Time) => "string".to_string(),
         }
     }
 }
@@ -182,7 +182,7 @@ mod tests {
         type MyStruct = {
         	a_string: string;
         	renamed_tho: number;
-        	also_renamed: bool;
+        	also_renamed: boolean;
         	a_float: number;
         }
         "###

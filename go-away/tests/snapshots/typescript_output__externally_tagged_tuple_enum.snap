@@ -4,7 +4,7 @@ expression: "go_away::registry_to_typescript_output(registry)"
 
 ---
 type Two = {
-	y: bool;
+	y: boolean;
 }
 type One = {
 	x: number;
