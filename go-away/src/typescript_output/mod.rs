@@ -45,13 +45,51 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
                 }
                 writeln!(f, "}}")?;
             }
-            TypeScriptType::Union(details) => {
-                let mut union_types: Vec<String> = vec![];
-                for variant in &details.variants {
-                    union_types.push(variant.typescript_name());
+            TypeScriptType::Union(details) => match &details.representation {
+                UnionRepresentation::ExternallyTagged => {
+                    let mut union_types: Vec<String> = vec![];
+                    for variant in &details.variants {
+                        union_types.push(format!(
+                            "{{ \"{}\": {} }}",
+                            variant.serialized_name,
+                            variant.typescript_name()
+                        ));
+                    }
+                    writeln!(f, "type {} = {};", details.name, union_types.join(" | "))?;
                 }
-                writeln!(f, "type {} = {};", details.name, union_types.join(" | "))?;
-            }
+                UnionRepresentation::InternallyTagged { tag } => {
+                    let mut union_types: Vec<String> = vec![];
+                    for variant in &details.variants {
+                        union_types.push(format!(
+                            "({{ \"{}\": \"{}\" }} & {})",
+                            tag,
+                            variant.serialized_name,
+                            variant.typescript_name()
+                        ));
+                    }
+                    writeln!(f, "type {} = {};", details.name, union_types.join(" | "))?;
+                }
+                UnionRepresentation::Untagged => {
+                    let mut union_types: Vec<String> = vec![];
+                    for variant in &details.variants {
+                        union_types.push(variant.typescript_name());
+                    }
+                    writeln!(f, "type {} = {};", details.name, union_types.join(" | "))?;
+                }
+                UnionRepresentation::AdjacentlyTagged { tag, content } => {
+                    let mut union_types: Vec<String> = vec![];
+                    for variant in &details.variants {
+                        union_types.push(format!(
+                            "{{ \"{}\": \"{}\", \"{}\": {} }}",
+                            tag,
+                            variant.serialized_name,
+                            content,
+                            variant.typescript_name()
+                        ));
+                    }
+                    writeln!(f, "type {} = {};", details.name, union_types.join(" | "))?;
+                }
+            },
         }
 
         Ok(())
@@ -185,6 +223,62 @@ mod tests {
     }
 
     #[test]
+    fn test_externally_tagged_union_output() {
+        assert_snapshot!(TypeScriptType::Union(&Union {
+            name: "MyUnion".into(),
+            representation: UnionRepresentation::ExternallyTagged,
+            variants: vec![
+                UnionVariant {
+                    name: Some("VarOne".into()),
+                    ty: FieldType::Named(TypeRef {
+                        name: "VarOne".into()
+                    }),
+                    serialized_name: "VAR_ONE".into(),
+                },
+                UnionVariant {
+                    name: Some("VarTwo".into()),
+                    ty: FieldType::Named(TypeRef {
+                        name: "VarTwo".into()
+                    }),
+                    serialized_name: "VAR_TWO".into(),
+                }
+            ]
+        })
+        .to_string(), @r###"
+        type MyUnion = { "VAR_ONE": VarOne } | { "VAR_TWO": VarTwo };
+		"###);
+    }
+
+    #[test]
+    fn test_interally_tagged_union_output() {
+        assert_snapshot!(TypeScriptType::Union(&Union {
+            name: "MyUnion".into(),
+            representation: UnionRepresentation::InternallyTagged {
+                tag: "type".to_string()
+            },
+            variants: vec![
+                UnionVariant {
+                    name: Some("VarOne".into()),
+                    ty: FieldType::Named(TypeRef {
+                        name: "VarOne".into()
+                    }),
+                    serialized_name: "VAR_ONE".into(),
+                },
+                UnionVariant {
+                    name: Some("VarTwo".into()),
+                    ty: FieldType::Named(TypeRef {
+                        name: "VarTwo".into()
+                    }),
+                    serialized_name: "VAR_TWO".into(),
+                }
+            ]
+        })
+        .to_string(), @r###"
+        type MyUnion = ({ "type": "VAR_ONE" } & VarOne) | ({ "type": "VAR_TWO" } & VarTwo);
+		"###);
+    }
+
+    #[test]
     fn test_adjacently_tagged_union_output() {
         assert_snapshot!(TypeScriptType::Union(&Union {
             name: "MyUnion".into(),
@@ -192,6 +286,33 @@ mod tests {
                 tag: "type".into(),
                 content: "data".into(),
             },
+            variants: vec![
+                UnionVariant {
+                    name: Some("VarOne".into()),
+                    ty: FieldType::Named(TypeRef {
+                        name: "VarOne".into()
+                    }),
+                    serialized_name: "VAR_ONE".into(),
+                },
+                UnionVariant {
+                    name: Some("VarTwo".into()),
+                    ty: FieldType::Named(TypeRef {
+                        name: "VarTwo".into()
+                    }),
+                    serialized_name: "VAR_TWO".into(),
+                }
+            ]
+        })
+        .to_string(), @r###"
+        type MyUnion = { "type": "VAR_ONE", "data": VarOne } | { "type": "VAR_TWO", "data": VarTwo };
+		"###);
+    }
+
+    #[test]
+    fn test_untagged_union_output() {
+        assert_snapshot!(TypeScriptType::Union(&Union {
+            name: "MyUnion".into(),
+            representation: UnionRepresentation::Untagged,
             variants: vec![
                 UnionVariant {
                     name: Some("VarOne".into()),

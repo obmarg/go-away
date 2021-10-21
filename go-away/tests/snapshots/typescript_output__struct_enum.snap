@@ -16,7 +16,7 @@ type OptionOne = {
 	x: string;
 	y: number;
 }
-type StructEnum = OptionOne | OptionTwo;
+type StructEnum = { "type": "OptionOne", "data": OptionOne } | { "type": "OptionTwo", "data": OptionTwo };
 enum FulfilmentType {
 	Delivery = "Delivery",
 	Collection = "Collection",

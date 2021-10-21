@@ -9,5 +9,5 @@ type Two = {
 type One = {
 	x: number;
 }
-type InternallyTaggedTupleEnum = One | Two;
+type InternallyTaggedTupleEnum = ({ "type": "One" } & One) | ({ "type": "Two" } & Two);
 

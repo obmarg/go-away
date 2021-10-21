@@ -9,5 +9,5 @@ type Two = {
 type One = {
 	x: number;
 }
-type NewTypeEnum = { "type": "OptionOne", "data": OptionOne } | { "type": "OptionTwo", "data": OptionTwo };
+type ExternallyTaggedTupleEnum = { "One": One } | { "Two": Two };
 

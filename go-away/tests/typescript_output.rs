@@ -88,6 +88,35 @@ fn test_internally_tagged_tuple_enum() {
 }
 
 #[derive(TypeMetadata)]
+enum ExternallyTaggedTupleEnum {
+    One(One),
+    Two(Two),
+}
+
+#[test]
+fn test_externally_tagged_tuple_enum() {
+    let mut registry = TypeRegistry::new();
+    ExternallyTaggedTupleEnum::metadata(&mut registry);
+
+    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+}
+
+#[derive(TypeMetadata)]
+#[serde(untagged)]
+enum UntaggedTupleEnum {
+    One(One),
+    Two(Two),
+}
+
+#[test]
+fn test_untagged_tuple_enum() {
+    let mut registry = TypeRegistry::new();
+    UntaggedTupleEnum::metadata(&mut registry);
+
+    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+}
+
+#[derive(TypeMetadata)]
 struct TypeWithLifetimes<'a, 'b> {
     data: &'a str,
     other: &'b str,
