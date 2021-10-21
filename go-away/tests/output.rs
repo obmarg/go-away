@@ -118,7 +118,7 @@ fn type_aliases() {
 
     let mut registry = TypeRegistry::new();
 
-    MyType::register_as_alias("MyType", &mut registry);
+    MyType::register_alias("MyType", &mut registry);
 
     assert_snapshot!(go_away::registry_to_output(registry), @"type MyType map[string]int
 ");

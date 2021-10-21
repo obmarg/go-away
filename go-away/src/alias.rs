@@ -10,14 +10,14 @@ pub trait TypeAlias {
     /// Note that this should not be used on types which have `TypeMetadata`
     /// derived on them - it's only really meant for use on actual rust type
     /// aliases.
-    fn register_as_alias(name: &str, registry: &mut TypeRegistry);
+    fn register_alias(name: &str, registry: &mut TypeRegistry);
 }
 
 impl<T> TypeAlias for T
 where
     T: TypeMetadata + 'static,
 {
-    fn register_as_alias(name: &str, registry: &mut TypeRegistry) {
+    fn register_alias(name: &str, registry: &mut TypeRegistry) {
         let inner = Self::metadata(registry);
         registry.register_alias(
             crate::TypeId::for_type::<Self>(),
