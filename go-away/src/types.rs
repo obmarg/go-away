@@ -38,6 +38,18 @@ pub struct NewType {
     pub inner: FieldType,
 }
 
+/// A type alias (e.g. `type SomeType = HashMap<String, String>;`)
+///
+/// These are usually represented as their inner type when serialized.
+#[derive(Debug)]
+pub struct Alias {
+    /// The name of the type alias in rust.
+    pub name: String,
+
+    /// The type that is being aliased.
+    pub inner: FieldType,
+}
+
 /// An enum - note that in go-away these do not contain data.
 ///
 /// A Rust enum that's variants contain values will go to a `UnionType`
