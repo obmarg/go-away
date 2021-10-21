@@ -1,7 +1,7 @@
 pub use std::collections::HashMap;
 
 pub use super::{
-    types::{Enum, NewType, Struct, TypeRef, Union},
+    types::{Alias, Enum, NewType, Struct, TypeRef, Union},
     TypeId,
 };
 
@@ -22,12 +22,21 @@ pub struct TypeRegistry {
     pub(super) unions: Vec<TypeId>,
     /// An ordered list of newtype IDs, used to output in order.
     pub(super) newtypes: Vec<TypeId>,
+    /// An ordered list of alias IDs
+    pub(super) aliases: Vec<TypeId>,
 }
 
 impl TypeRegistry {
     /// Construct a new TypeRegistry
     pub fn new() -> Self {
         TypeRegistry::default()
+    }
+
+    pub fn register_alias(&mut self, id: TypeId, details: Alias) -> TypeRef {
+        if !self.types.contains_key(&id) {
+            self.aliases.push(id.clone());
+        }
+        self.register_type(id, Type::Alias(details))
     }
 
     /// Register a `Struct`
@@ -84,6 +93,7 @@ pub(super) enum Type {
     Enum(Enum),
     Union(Union),
     NewType(NewType),
+    Alias(Alias),
 }
 
 impl Type {
@@ -99,6 +109,9 @@ impl Type {
                 name: un.name.clone(),
             },
             Type::NewType(nt) => TypeRef {
+                name: nt.name.clone(),
+            },
+            Type::Alias(nt) => TypeRef {
                 name: nt.name.clone(),
             },
         }
