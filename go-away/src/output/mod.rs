@@ -13,6 +13,7 @@ pub use super::types::*;
 pub enum GoType<'a> {
     Struct(&'a Struct),
     NewType(&'a NewType),
+    Alias(&'a Alias),
     Enum(&'a Enum),
     Union(&'a Union),
 }
@@ -29,6 +30,9 @@ impl<'a> fmt::Display for GoType<'a> {
                 writeln!(f, "}}")?;
             }
             GoType::NewType(details) => {
+                writeln!(f, "type {} {}", details.name, details.inner.go_type())?;
+            }
+            GoType::Alias(details) => {
                 writeln!(f, "type {} {}", details.name, details.inner.go_type())?;
             }
             GoType::Enum(details) => {

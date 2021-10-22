@@ -34,6 +34,7 @@
 
 #![warn(missing_docs)]
 
+mod alias;
 mod metadata;
 mod output;
 mod registry;
@@ -42,6 +43,7 @@ mod typescript_output;
 
 pub mod types;
 
+pub use alias::TypeAlias;
 pub use metadata::TypeMetadata;
 pub use registry::TypeRegistry;
 pub use type_id::TypeId;
@@ -71,6 +73,10 @@ pub fn registry_to_output(registry: TypeRegistry) -> String {
         let ty = registry.types.get(&id).unwrap();
         write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
     }
+    for id in registry.aliases.into_iter().rev() {
+        let ty = registry.types.get(&id).unwrap();
+        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
+    }
 
     output
 }
@@ -82,6 +88,7 @@ impl<'a> From<&'a registry::Type> for output::GoType<'a> {
             registry::Type::Enum(inner) => output::GoType::Enum(inner),
             registry::Type::Union(inner) => output::GoType::Union(inner),
             registry::Type::NewType(inner) => output::GoType::NewType(inner),
+            registry::Type::Alias(inner) => output::GoType::Alias(inner),
         }
     }
 }
