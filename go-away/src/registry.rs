@@ -85,7 +85,7 @@ impl TypeRegistry {
     fn register_type(&mut self, id: TypeId, ty: Type) -> TypeRef {
         if self.types.contains_key(&id) {
             match self.types.get(&id) {
-                Some(existing) if ty.same_kind(&existing) => return existing.type_ref(),
+                Some(existing) if ty.same_kind(existing) => return existing.type_ref(),
                 other => panic!("Type register mismatch: {:?} vs {:?}", ty, other),
             }
         }

@@ -61,9 +61,9 @@ impl<'a> fmt::Display for GoType<'a> {
                     )?;
                 }
                 writeln!(f, "}}\n")?;
-                write!(f, "{}", UnionMarshal(&details))?;
-                write!(f, "{}", UnionUnmarshal(&details))?;
-                write!(f, "{}", UnionValidate(&details))?;
+                write!(f, "{}", UnionMarshal(details))?;
+                write!(f, "{}", UnionUnmarshal(details))?;
+                write!(f, "{}", UnionValidate(details))?;
             }
         }
 
@@ -129,7 +129,7 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
                         AdjacentlyTaggedMarshaller {
                             tag,
                             content,
-                            variant: &variant
+                            variant
                         }
                     )?;
                 }
@@ -137,10 +137,7 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
                     write!(
                         indented(f),
                         "{}",
-                        InternallyTaggedMarshaller {
-                            tag,
-                            variant: &variant
-                        }
+                        InternallyTaggedMarshaller { tag, variant }
                     )?;
                 }
                 _ => todo!("Implement the other tagging enum representations"),
