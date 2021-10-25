@@ -137,10 +137,7 @@ impl<'a> fmt::Display for UnionMarshal<'a> {
                     write!(
                         indented(f),
                         "{}",
-                        InternallyTaggedMarshaller {
-                            tag,
-                            variant
-                        }
+                        InternallyTaggedMarshaller { tag, variant }
                     )?;
                 }
                 _ => todo!("Implement the other tagging enum representations"),
