@@ -12,9 +12,6 @@ use serde::{Deserialize, Serialize};
 
 use go_away::{registry_to_output, TypeMetadata, TypeRegistry};
 
-#[cfg(feature = "chrono")]
-use chrono::{DateTime, NaiveDateTime, Utc};
-
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type")]
 enum SomeUnion {
