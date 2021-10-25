@@ -32,6 +32,9 @@ impl TypeRegistry {
         TypeRegistry::default()
     }
 
+    /// Registers an `Alias` in the `TypeRegistry`
+    ///
+    /// Users should use `crate::TypeAlias::register_alias` rather than calling this directly.
     pub fn register_alias(&mut self, id: TypeId, details: Alias) -> TypeRef {
         if !self.types.contains_key(&id) {
             self.aliases.push(id.clone());
@@ -40,6 +43,8 @@ impl TypeRegistry {
     }
 
     /// Register a `Struct`
+    ///
+    /// Users should use `crate::TypeMetadata::metadata` rather than calling this directly.
     pub fn register_struct(&mut self, id: TypeId, details: Struct) -> TypeRef {
         if !self.types.contains_key(&id) {
             self.structs.push(id.clone());
@@ -48,6 +53,8 @@ impl TypeRegistry {
     }
 
     /// Register a `NewType`
+    ///
+    /// Users should use `crate::TypeMetadata::metadata` rather than calling this directly.
     pub fn register_newtype(&mut self, id: TypeId, details: NewType) -> TypeRef {
         if !self.types.contains_key(&id) {
             self.newtypes.push(id.clone());
@@ -56,6 +63,8 @@ impl TypeRegistry {
     }
 
     /// Register an `Enum`
+    ///
+    /// Users should use `crate::TypeMetadata::metadata` rather than calling this directly.
     pub fn register_enum(&mut self, id: TypeId, details: Enum) -> TypeRef {
         if !self.types.contains_key(&id) {
             self.enums.push(id.clone());
@@ -64,6 +73,8 @@ impl TypeRegistry {
     }
 
     /// Register a `Uninon`
+    ///
+    /// Users should use `crate::TypeMetadata::metadata` rather than calling this directly.
     pub fn register_union(&mut self, id: TypeId, details: Union) -> TypeRef {
         if !self.types.contains_key(&id) {
             self.unions.push(id.clone());
