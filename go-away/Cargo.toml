@@ -14,6 +14,7 @@ categories = ["development-tools", "development-tools::ffi", "encoding", "web-pr
 
 [features]
 default = []
+all = ["chrono"]
 
 [dependencies]
 indenter = "0.3.3"
