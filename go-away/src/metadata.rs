@@ -1,5 +1,4 @@
 use crate::{
-    registry::Alias,
     types::{FieldType, Primitive},
 };
 
