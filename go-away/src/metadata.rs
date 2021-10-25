@@ -1,7 +1,4 @@
-use crate::{
-    registry::Alias,
-    types::{FieldType, Primitive},
-};
+use crate::types::{FieldType, Primitive};
 
 use super::TypeRegistry;
 
