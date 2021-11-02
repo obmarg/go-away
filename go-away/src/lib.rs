@@ -53,7 +53,10 @@ pub use go_away_derive::TypeMetadata;
 use registry::Type;
 use std::fmt::Display;
 
-/// Generates go ocde for all the types in the TypeRegistry
+/// Generates code for all the types in the TypeRegistry
+///
+/// You should provide `go_away::GoType` or `go_away::TypeScriptType` as a generic
+/// parameter with turbofish syntax to decide which format to output.
 ///
 /// Note that this is a WIP API and is likely to be ditched/changed in future releases.
 pub fn registry_to_output<'a, Format>(registry: &'a TypeRegistry) -> String
@@ -64,23 +67,23 @@ where
 
     let mut output = String::new();
     for id in registry.structs.iter().rev() {
-        let ty = registry.types.get(&id).unwrap();
+        let ty = registry.types.get(id).unwrap();
         write!(&mut output, "{}", Format::from(ty)).unwrap();
     }
     for id in registry.unions.iter().rev() {
-        let ty = registry.types.get(&id).unwrap();
+        let ty = registry.types.get(id).unwrap();
         write!(&mut output, "{}", Format::from(ty)).unwrap();
     }
     for id in registry.newtypes.iter().rev() {
-        let ty = registry.types.get(&id).unwrap();
+        let ty = registry.types.get(id).unwrap();
         write!(&mut output, "{}", Format::from(ty)).unwrap();
     }
     for id in registry.enums.iter().rev() {
-        let ty = registry.types.get(&id).unwrap();
+        let ty = registry.types.get(id).unwrap();
         write!(&mut output, "{}", Format::from(ty)).unwrap();
     }
     for id in registry.aliases.iter().rev() {
-        let ty = registry.types.get(&id).unwrap();
+        let ty = registry.types.get(id).unwrap();
         write!(&mut output, "{}", Format::from(ty)).unwrap();
     }
 
