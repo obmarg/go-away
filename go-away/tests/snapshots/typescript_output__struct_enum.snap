@@ -3,21 +3,21 @@ source: go-away/tests/typescript_output.rs
 expression: "go_away::registry_to_typescript_output(registry)"
 
 ---
-type OptionTwo = {
+export type OptionTwo = {
 	foo: string;
 	bar: Nested;
 }
-type Nested = {
+export type Nested = {
 	some_other_name: string;
 	an_int: number;
 	fulfilment_type: FulfilmentType;
 }
-type OptionOne = {
+export type OptionOne = {
 	x: string;
 	y: number;
 }
-type StructEnum = { "type": "OptionOne", "data": OptionOne } | { "type": "OptionTwo", "data": OptionTwo };
-enum FulfilmentType {
+export type StructEnum = { "type": "OptionOne", "data": OptionOne } | { "type": "OptionTwo", "data": OptionTwo };
+export enum FulfilmentType {
 	Delivery = "Delivery",
 	Collection = "Collection",
 }

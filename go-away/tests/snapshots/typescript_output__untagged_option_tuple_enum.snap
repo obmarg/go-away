@@ -3,11 +3,11 @@ source: go-away/tests/typescript_output.rs
 expression: "go_away::registry_to_typescript_output(registry)"
 
 ---
-type Two = {
+export type Two = {
 	y: boolean;
 }
-type One = {
+export type One = {
 	x: number;
 }
-type UntaggedOptionTupleEnum = One | null | Two;
+export type UntaggedOptionTupleEnum = One | null | Two;
 

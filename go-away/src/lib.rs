@@ -104,7 +104,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         let ty = registry.types.get(&id).unwrap();
         write!(
             &mut output,
-            "{}",
+            "export {}",
             typescript_output::TypeScriptType::from(ty)
         )
         .unwrap();
@@ -113,7 +113,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         let ty = registry.types.get(&id).unwrap();
         write!(
             &mut output,
-            "{}",
+            "export {}",
             typescript_output::TypeScriptType::from(ty)
         )
         .unwrap();
@@ -122,7 +122,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         let ty = registry.types.get(&id).unwrap();
         write!(
             &mut output,
-            "{}",
+            "export {}",
             typescript_output::TypeScriptType::from(ty)
         )
         .unwrap();
@@ -131,7 +131,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         let ty = registry.types.get(&id).unwrap();
         write!(
             &mut output,
-            "{}",
+            "export {}",
             typescript_output::TypeScriptType::from(ty)
         )
         .unwrap();
@@ -140,7 +140,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         let ty = registry.types.get(&id).unwrap();
         write!(
             &mut output,
-            "{}",
+            "export {}",
             typescript_output::TypeScriptType::from(ty)
         )
         .unwrap();
