@@ -4,16 +4,16 @@ expression: "go_away::registry_to_typescript_output(registry)"
 
 ---
 export type MyData = {
-	field_one: string;
-	nested: Nested;
+    field_one: string;
+    nested: Nested;
 }
 export type Nested = {
-	some_other_name: string;
-	an_int: number;
-	fulfilment_type: FulfilmentType;
+    some_other_name: string;
+    an_int: number;
+    fulfilment_type: FulfilmentType;
 }
 export enum FulfilmentType {
-	Delivery = "Delivery",
-	Collection = "Collection",
+    Delivery = "Delivery",
+    Collection = "Collection",
 }
 

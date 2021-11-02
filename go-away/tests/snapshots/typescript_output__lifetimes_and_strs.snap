@@ -4,7 +4,7 @@ expression: "go_away::registry_to_typescript_output(registry)"
 
 ---
 export type TypeWithLifetimes = {
-	data: string;
-	other: string;
+    data: string;
+    other: string;
 }
 

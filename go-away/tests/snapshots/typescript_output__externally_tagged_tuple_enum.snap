@@ -4,10 +4,10 @@ expression: "go_away::registry_to_typescript_output(registry)"
 
 ---
 export type Two = {
-	y: boolean;
+    y: boolean;
 }
 export type One = {
-	x: number;
+    x: number;
 }
 export type ExternallyTaggedTupleEnum = { "One": One } | { "Two": Two };
 

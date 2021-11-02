@@ -1,9 +1,6 @@
 use std::{fmt, fmt::Write};
 
 use indenter::indented;
-// use indoc::writedoc;
-
-use super::tabify;
 
 pub use crate::types::*;
 
@@ -17,7 +14,6 @@ pub enum TypeScriptType<'a> {
 
 impl<'a> fmt::Display for TypeScriptType<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        let f = &mut tabify::tabify(f);
         match self {
             TypeScriptType::Struct(details) => {
                 writeln!(f, "type {} = {{", details.name)?;
@@ -190,10 +186,10 @@ mod tests {
             .to_string(),
             @r###"
         type MyStruct = {
-        	a_string: string;
-        	renamed_tho: number;
-        	also_renamed: boolean;
-        	a_float: number;
+            a_string: string;
+            renamed_tho: number;
+            also_renamed: boolean;
+            a_float: number;
         }
         "###
         );
@@ -255,10 +251,10 @@ mod tests {
         })
         .to_string(), @r###"
         enum FulfilmentType {
-        	Delivery = "DELIVERY",
-        	Collection = "COLLECTION",
+            Delivery = "DELIVERY",
+            Collection = "COLLECTION",
         }
-		"###);
+        "###);
     }
 
     #[test]
