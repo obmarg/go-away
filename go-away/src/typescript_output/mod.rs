@@ -10,6 +10,7 @@ pub use super::types::*;
 pub enum TypeScriptType<'a> {
     Struct(&'a Struct),
     NewType(&'a NewType),
+    Alias(&'a Alias),
     Enum(&'a Enum),
     Union(&'a Union),
 }
@@ -26,6 +27,14 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
                 writeln!(f, "}}")?;
             }
             TypeScriptType::NewType(details) => {
+                writeln!(
+                    f,
+                    "type {} = {}",
+                    details.name,
+                    details.inner.typescript_type()
+                )?;
+            }
+            TypeScriptType::Alias(details) => {
                 writeln!(
                     f,
                     "type {} = {}",
@@ -118,7 +127,7 @@ impl FieldType {
             FieldType::List(inner) => format!("{}[]", inner.typescript_type()),
             FieldType::Map { key, value } => {
                 format!(
-                    "Record<{}, {}>",
+                    "Record<{}, {}>;",
                     key.typescript_type(),
                     value.typescript_type()
                 )
@@ -197,6 +206,35 @@ mod tests {
         })
         .to_string(), @"type UserId = string
 ");
+    }
+
+    #[test]
+    fn test_newtype_struct_output() {
+        // pub type Users = HashMap<UserId, UserData>;
+        assert_snapshot!(TypeScriptType::NewType(&NewType {
+            name: "Users".into(),
+            inner: FieldType::Map{ key: Box::new(FieldType::Named(TypeRef {
+                name: "UserId".into()
+            })), value: Box::new(FieldType::Named(TypeRef {
+                name: "UserData".into()
+            }))},
+        })
+        .to_string(), @"type Users = Record<UserId, UserData>;
+    ");
+    }
+
+    #[test]
+    fn test_alias_output() {
+        // pub type Users = HashMap<UserId, UserData>;
+        assert_snapshot!(TypeScriptType::Alias(&Alias {
+        name: "Users".into(),
+        inner: FieldType::Map{ key: Box::new(FieldType::Named(TypeRef {
+            name: "UserId".into()
+        })), value: Box::new(FieldType::Named(TypeRef {
+            name: "UserData".into()
+        }))},
+    })
+    .to_string(), @"type Users = Record<UserId, UserData>;");
     }
 
     #[test]
@@ -350,7 +388,7 @@ mod tests {
                 key: Box::new(FieldType::Primitive(Primitive::String)),
                 value: Box::new(FieldType::Primitive(Primitive::Int))
             }.typescript_type(),
-            @"Record<string, number>"
+            @"Record<string, number>;"
         );
     }
 

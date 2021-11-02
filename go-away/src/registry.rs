@@ -32,6 +32,7 @@ impl TypeRegistry {
         TypeRegistry::default()
     }
 
+    /// Register an `Alias`
     pub fn register_alias(&mut self, id: TypeId, details: Alias) -> TypeRef {
         if !self.types.contains_key(&id) {
             self.aliases.push(id.clone());

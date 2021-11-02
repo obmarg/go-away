@@ -2,7 +2,7 @@
 
 use insta::assert_snapshot;
 
-use go_away::{TypeMetadata, TypeRegistry};
+use go_away::{TypeAlias, TypeMetadata, TypeRegistry};
 
 #[derive(TypeMetadata)]
 struct MyData {
@@ -137,6 +137,17 @@ fn type_deduplication() {
     // These both contain `Nested` so there should be one `Nested` type in the output
     StructEnum::metadata(&mut registry);
     MyData::metadata(&mut registry);
+
+    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+}
+
+#[test]
+fn type_aliases() {
+    type MyType = std::collections::HashMap<String, i64>;
+
+    let mut registry = TypeRegistry::new();
+
+    MyType::register_alias("MyType", &mut registry);
 
     assert_snapshot!(go_away::registry_to_typescript_output(registry));
 }

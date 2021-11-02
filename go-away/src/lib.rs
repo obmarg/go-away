@@ -136,6 +136,15 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         )
         .unwrap();
     }
+    for id in registry.aliases.into_iter().rev() {
+        let ty = registry.types.get(&id).unwrap();
+        write!(
+            &mut output,
+            "{}",
+            typescript_output::TypeScriptType::from(ty)
+        )
+        .unwrap();
+    }
 
     output
 }
@@ -147,6 +156,7 @@ impl<'a> From<&'a registry::Type> for typescript_output::TypeScriptType<'a> {
             registry::Type::Enum(inner) => typescript_output::TypeScriptType::Enum(inner),
             registry::Type::Union(inner) => typescript_output::TypeScriptType::Union(inner),
             registry::Type::NewType(inner) => typescript_output::TypeScriptType::NewType(inner),
+            registry::Type::Alias(inner) => typescript_output::TypeScriptType::Alias(inner),
         }
     }
 }
