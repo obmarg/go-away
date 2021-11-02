@@ -144,8 +144,8 @@ impl FieldType {
 impl UnionVariant {
     fn typescript_name(&self) -> String {
         match (&self.name, &self.ty) {
-            (Some(name), _) => name.clone(),
             (_, FieldType::Named(type_ref)) => type_ref.name().to_string(),
+            (Some(name), _) => name.clone(),
             _ => todo!("Variant must be named or named type for now (fix this later)"),
         }
     }
@@ -353,24 +353,24 @@ mod tests {
             representation: UnionRepresentation::Untagged,
             variants: vec![
                 UnionVariant {
-                    name: Some("VarOne".into()),
+                    name: Some("VarA".into()),
                     ty: FieldType::Named(TypeRef {
                         name: "VarOne".into()
                     }),
-                    serialized_name: "VAR_ONE".into(),
+                    serialized_name: "VAR_A".into(),
                 },
                 UnionVariant {
-                    name: Some("VarTwo".into()),
+                    name: Some("VarB".into()),
                     ty: FieldType::Named(TypeRef {
                         name: "VarTwo".into()
                     }),
-                    serialized_name: "VAR_TWO".into(),
+                    serialized_name: "VAR_A".into(),
                 }
             ]
         })
         .to_string(), @r###"
         type MyUnion = VarOne | VarTwo;
-		"###);
+    	"###);
     }
 
     #[test]

@@ -104,8 +104,8 @@ fn test_externally_tagged_tuple_enum() {
 #[derive(TypeMetadata)]
 #[serde(untagged)]
 enum UntaggedTupleEnum {
-    One(One),
-    Two(Two),
+    A(One),
+    B(Two),
 }
 
 #[test]

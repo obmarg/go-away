@@ -9,5 +9,4 @@ type Two = {
 type One = {
 	x: number;
 }
-type NewTypeEnum = { "type": "OptionOne", "data": OptionOne } | { "type": "OptionTwo", "data": OptionTwo };
-
+type NewTypeEnum = { "type": "OptionOne", "data": One } | { "type": "OptionTwo", "data": Two };
