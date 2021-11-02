@@ -11,6 +11,18 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+### Breaking Changes
+
+- `registry_to_output` now requires a generic parameter to be provided via turbofish
+  syntax to determine the output format for the code. `go_away::GoType` will output
+  go code, `go_away::TypeScriptType` will output typescript.
+
+### New Features
+
+- `go-away` now supports generating types for typescript.
+- Added a `TypeAlias` trait that can be used to output type aliases into the output:
+  `MyType::register_alias("MyType", &mut registry)`
+
 ## v0.4.0 - 2021-07-16
 
 ### New Features
