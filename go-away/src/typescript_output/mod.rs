@@ -29,7 +29,7 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
             TypeScriptType::NewType(details) => {
                 writeln!(
                     f,
-                    "type {} = {}",
+                    "type {} = {};",
                     details.name,
                     details.inner.typescript_type()
                 )?;
@@ -37,7 +37,7 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
             TypeScriptType::Alias(details) => {
                 writeln!(
                     f,
-                    "type {} = {}",
+                    "type {} = {};",
                     details.name,
                     details.inner.typescript_type()
                 )?;
@@ -127,7 +127,7 @@ impl FieldType {
             FieldType::List(inner) => format!("{}[]", inner.typescript_type()),
             FieldType::Map { key, value } => {
                 format!(
-                    "Record<{}, {}>;",
+                    "Record<{}, {}>",
                     key.typescript_type(),
                     value.typescript_type()
                 )
@@ -205,7 +205,7 @@ mod tests {
             name: "UserId".into(),
             inner: FieldType::Primitive(Primitive::String),
         })
-        .to_string(), @"type UserId = string
+        .to_string(), @"type UserId = string;
 ");
     }
 
@@ -416,7 +416,7 @@ mod tests {
                 key: Box::new(FieldType::Primitive(Primitive::String)),
                 value: Box::new(FieldType::Primitive(Primitive::Int))
             }.typescript_type(),
-            @"Record<string, number>;"
+            @"Record<string, number>"
         );
     }
 
