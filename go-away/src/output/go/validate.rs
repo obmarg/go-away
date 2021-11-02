@@ -46,10 +46,8 @@ mod tests {
     use insta::assert_snapshot;
 
     use super::*;
-    use crate::{
-        output::{FieldType, UnionRepresentation, UnionVariant},
-        registry::TypeRef,
-    };
+    use crate::output::go::{FieldType, UnionRepresentation, UnionVariant};
+    use crate::registry::TypeRef;
 
     #[test]
     fn test_validate_output() {

@@ -3,9 +3,9 @@ use std::{fmt, fmt::Write};
 use indenter::indented;
 // use indoc::writedoc;
 
-mod tabify;
+use super::tabify;
 
-pub use super::types::*;
+pub use crate::types::*;
 
 pub enum TypeScriptType<'a> {
     Struct(&'a Struct),

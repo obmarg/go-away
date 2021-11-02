@@ -39,7 +39,6 @@ mod metadata;
 mod output;
 mod registry;
 mod type_id;
-mod typescript_output;
 
 pub mod types;
 
@@ -59,36 +58,36 @@ pub fn registry_to_output(registry: TypeRegistry) -> String {
     let mut output = String::new();
     for id in registry.structs.into_iter().rev() {
         let ty = registry.types.get(&id).unwrap();
-        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
+        write!(&mut output, "{}", output::go::GoType::from(ty)).unwrap();
     }
     for id in registry.unions.into_iter().rev() {
         let ty = registry.types.get(&id).unwrap();
-        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
+        write!(&mut output, "{}", output::go::GoType::from(ty)).unwrap();
     }
     for id in registry.newtypes.into_iter().rev() {
         let ty = registry.types.get(&id).unwrap();
-        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
+        write!(&mut output, "{}", output::go::GoType::from(ty)).unwrap();
     }
     for id in registry.enums.into_iter().rev() {
         let ty = registry.types.get(&id).unwrap();
-        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
+        write!(&mut output, "{}", output::go::GoType::from(ty)).unwrap();
     }
     for id in registry.aliases.into_iter().rev() {
         let ty = registry.types.get(&id).unwrap();
-        write!(&mut output, "{}", output::GoType::from(ty)).unwrap();
+        write!(&mut output, "{}", output::go::GoType::from(ty)).unwrap();
     }
 
     output
 }
 
-impl<'a> From<&'a registry::Type> for output::GoType<'a> {
+impl<'a> From<&'a registry::Type> for output::go::GoType<'a> {
     fn from(ty: &'a registry::Type) -> Self {
         match ty {
-            registry::Type::Struct(inner) => output::GoType::Struct(inner),
-            registry::Type::Enum(inner) => output::GoType::Enum(inner),
-            registry::Type::Union(inner) => output::GoType::Union(inner),
-            registry::Type::NewType(inner) => output::GoType::NewType(inner),
-            registry::Type::Alias(inner) => output::GoType::Alias(inner),
+            registry::Type::Struct(inner) => output::go::GoType::Struct(inner),
+            registry::Type::Enum(inner) => output::go::GoType::Enum(inner),
+            registry::Type::Union(inner) => output::go::GoType::Union(inner),
+            registry::Type::NewType(inner) => output::go::GoType::NewType(inner),
+            registry::Type::Alias(inner) => output::go::GoType::Alias(inner),
         }
     }
 }
@@ -105,7 +104,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         write!(
             &mut output,
             "export {}",
-            typescript_output::TypeScriptType::from(ty)
+            output::typescript::TypeScriptType::from(ty)
         )
         .unwrap();
     }
@@ -114,7 +113,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         write!(
             &mut output,
             "export {}",
-            typescript_output::TypeScriptType::from(ty)
+            output::typescript::TypeScriptType::from(ty)
         )
         .unwrap();
     }
@@ -123,7 +122,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         write!(
             &mut output,
             "export {}",
-            typescript_output::TypeScriptType::from(ty)
+            output::typescript::TypeScriptType::from(ty)
         )
         .unwrap();
     }
@@ -132,7 +131,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         write!(
             &mut output,
             "export {}",
-            typescript_output::TypeScriptType::from(ty)
+            output::typescript::TypeScriptType::from(ty)
         )
         .unwrap();
     }
@@ -141,7 +140,7 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
         write!(
             &mut output,
             "export {}",
-            typescript_output::TypeScriptType::from(ty)
+            output::typescript::TypeScriptType::from(ty)
         )
         .unwrap();
     }
@@ -149,14 +148,14 @@ pub fn registry_to_typescript_output(registry: TypeRegistry) -> String {
     output
 }
 
-impl<'a> From<&'a registry::Type> for typescript_output::TypeScriptType<'a> {
+impl<'a> From<&'a registry::Type> for output::typescript::TypeScriptType<'a> {
     fn from(ty: &'a registry::Type) -> Self {
         match ty {
-            registry::Type::Struct(inner) => typescript_output::TypeScriptType::Struct(inner),
-            registry::Type::Enum(inner) => typescript_output::TypeScriptType::Enum(inner),
-            registry::Type::Union(inner) => typescript_output::TypeScriptType::Union(inner),
-            registry::Type::NewType(inner) => typescript_output::TypeScriptType::NewType(inner),
-            registry::Type::Alias(inner) => typescript_output::TypeScriptType::Alias(inner),
+            registry::Type::Struct(inner) => output::typescript::TypeScriptType::Struct(inner),
+            registry::Type::Enum(inner) => output::typescript::TypeScriptType::Enum(inner),
+            registry::Type::Union(inner) => output::typescript::TypeScriptType::Union(inner),
+            registry::Type::NewType(inner) => output::typescript::TypeScriptType::NewType(inner),
+            registry::Type::Alias(inner) => output::typescript::TypeScriptType::Alias(inner),
         }
     }
 }
