@@ -1,0 +1,13 @@
+---
+source: go-away/tests/typescript_output.rs
+expression: "go_away::registry_to_typescript_output(registry)"
+
+---
+export type Two = {
+    y: boolean;
+}
+export type One = {
+    x: number;
+}
+export type UntaggedOptionTupleEnum = One | null | Two;
+

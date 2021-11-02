@@ -1,0 +1,24 @@
+---
+source: go-away/tests/typescript_output.rs
+expression: "go_away::registry_to_typescript_output(registry)"
+
+---
+export type OptionTwo = {
+    foo: string;
+    bar: Nested;
+}
+export type Nested = {
+    some_other_name: string;
+    an_int: number;
+    fulfilment_type: FulfilmentType;
+}
+export type OptionOne = {
+    x: string;
+    y: number;
+}
+export type StructEnum = { "type": "OptionOne", "data": OptionOne } | { "type": "OptionTwo", "data": OptionTwo };
+export enum FulfilmentType {
+    Delivery = "Delivery",
+    Collection = "Collection",
+}
+
