@@ -11,6 +11,8 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+## v0.5.0 - 2021-11-02
+
 ### Breaking Changes
 
 - `registry_to_output` now requires a generic parameter to be provided via turbofish
