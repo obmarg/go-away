@@ -16,7 +16,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
     let ctx = Ctxt::new();
 
     let container =
-        Container::from_ast(&ctx, &ast, serde_derive_internals::Derive::Deserialize).unwrap();
+        Container::from_ast(&ctx, ast, serde_derive_internals::Derive::Deserialize).unwrap();
 
     match ctx.check() {
         Ok(_) => {}
@@ -29,7 +29,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
             return Ok(rv);
         }
     }
-    let type_id = TypeIdCall::for_struct(&container.ident, &container.generics);
+    let type_id = TypeIdCall::for_struct(&container.ident, container.generics);
 
     let ident = &container.ident;
     let name_literal = Literal::string(&ident.to_string());
@@ -97,7 +97,7 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
                 let variant_name = Literal::string(&variant.ident.to_string());
                 let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
                 let type_id =
-                    TypeIdCall::for_variant(&container.ident, &variant.ident, &container.generics);
+                    TypeIdCall::for_variant(&container.ident, &variant.ident, container.generics);
                 let inner_type_block =
                     struct_block(&variant.ident.to_string(), &variant.fields, type_id);
                 inner.append_all(quote! {
@@ -162,7 +162,7 @@ fn struct_block(name: &str, fields: &[Field], type_id: TypeIdCall<'_>) -> TokenS
     for field in fields {
         let field_name = name_of_member(&field.member);
         let serialized_name = Literal::string(&field.attrs.name().serialize_name());
-        let ty_def = metadata_call(&field.ty);
+        let ty_def = metadata_call(field.ty);
         rv.append_all(quote! {
             st.fields.push(
                 types::Field {
