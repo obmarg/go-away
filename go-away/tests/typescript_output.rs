@@ -117,6 +117,21 @@ fn test_untagged_tuple_enum() {
 }
 
 #[derive(TypeMetadata)]
+#[serde(untagged)]
+enum UntaggedOptionTupleEnum {
+    A(Option<One>),
+    B(Two),
+}
+
+#[test]
+fn test_untagged_option_tuple_enum() {
+    let mut registry = TypeRegistry::new();
+    UntaggedOptionTupleEnum::metadata(&mut registry);
+
+    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+}
+
+#[derive(TypeMetadata)]
 struct TypeWithLifetimes<'a, 'b> {
     data: &'a str,
     other: &'b str,

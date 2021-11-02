@@ -144,7 +144,8 @@ impl FieldType {
 impl UnionVariant {
     fn typescript_name(&self) -> String {
         match (&self.name, &self.ty) {
-            (_, FieldType::Named(type_ref)) => type_ref.name().to_string(),
+            (_, FieldType::Named(_)) => self.ty.typescript_type(),
+            (_, FieldType::Optional(_)) => self.ty.typescript_type(),
             (Some(name), _) => name.clone(),
             _ => todo!("Variant must be named or named type for now (fix this later)"),
         }
@@ -370,6 +371,33 @@ mod tests {
         })
         .to_string(), @r###"
         type MyUnion = VarOne | VarTwo;
+    	"###);
+    }
+
+    #[test]
+    fn test_untagged_option_union_output() {
+        assert_snapshot!(TypeScriptType::Union(&Union {
+            name: "MyUnion".into(),
+            representation: UnionRepresentation::Untagged,
+            variants: vec![
+                UnionVariant {
+                    name: Some("VarA".into()),
+                    ty: FieldType::Optional(Box::new(FieldType::Named(TypeRef {
+                        name: "VarOne".into()
+                    }))),
+                    serialized_name: "VAR_A".into(),
+                },
+                UnionVariant {
+                    name: Some("VarB".into()),
+                    ty: FieldType::Named(TypeRef {
+                        name: "VarTwo".into()
+                    }),
+                    serialized_name: "VAR_A".into(),
+                }
+            ]
+        })
+        .to_string(), @r###"
+        type MyUnion = VarOne | null | VarTwo;
     	"###);
     }
 
