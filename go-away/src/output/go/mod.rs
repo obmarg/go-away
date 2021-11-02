@@ -10,11 +10,20 @@ use validate::UnionValidate;
 
 pub use crate::types::*;
 
+/// An enum representing the possible top-level types in Golang
+///
+/// This shouldn't be instaniated directly but passed using turbofish operator
+/// to registry_to_output enabling it to write out in Golang
 pub enum GoType<'a> {
+    /// A struct variant
     Struct(&'a Struct),
+    /// A new type variant
     NewType(&'a NewType),
+    /// A type alias variant
     Alias(&'a Alias),
+    /// A simple enum variant (does not contain data)
     Enum(&'a Enum),
+    /// A union variant (enums with data)
     Union(&'a Union),
 }
 

@@ -59,7 +59,7 @@ where
 {
     let mut registry = TypeRegistry::new();
     T::metadata(&mut registry);
-    let go_code = registry_to_output(registry);
+    let go_code = registry_to_output::<go_away::GoType>(&registry);
     let path = format!("../go-temp/{}.go", test_name);
     let mut file = File::create(&path).unwrap();
 

@@ -99,7 +99,7 @@ impl TypeRegistry {
 
 #[derive(Debug)]
 #[allow(clippy::enum_variant_names)]
-pub(super) enum Type {
+pub enum Type {
     Struct(Struct),
     Enum(Enum),
     Union(Union),

@@ -15,7 +15,9 @@ fn test_struct_output() {
     let mut registry = TypeRegistry::new();
     MyData::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }
 
 #[derive(TypeMetadata)]
@@ -54,7 +56,9 @@ fn test_newtype_enum() {
     let mut registry = TypeRegistry::new();
     NewTypeEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }
 
 #[derive(TypeMetadata)]
@@ -69,7 +73,9 @@ fn test_struct_enum() {
     let mut registry = TypeRegistry::new();
     StructEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }
 
 #[derive(TypeMetadata)]
@@ -84,7 +90,9 @@ fn test_internally_tagged_tuple_enum() {
     let mut registry = TypeRegistry::new();
     InternallyTaggedTupleEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }
 
 #[derive(TypeMetadata)]
@@ -98,7 +106,9 @@ fn test_externally_tagged_tuple_enum() {
     let mut registry = TypeRegistry::new();
     ExternallyTaggedTupleEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }
 
 #[derive(TypeMetadata)]
@@ -113,7 +123,9 @@ fn test_untagged_tuple_enum() {
     let mut registry = TypeRegistry::new();
     UntaggedTupleEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }
 
 #[derive(TypeMetadata)]
@@ -128,7 +140,9 @@ fn test_untagged_option_tuple_enum() {
     let mut registry = TypeRegistry::new();
     UntaggedOptionTupleEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }
 
 #[derive(TypeMetadata)]
@@ -142,7 +156,9 @@ fn lifetimes_and_strs() {
     let mut registry = TypeRegistry::new();
     TypeWithLifetimes::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }
 
 #[test]
@@ -153,7 +169,9 @@ fn type_deduplication() {
     StructEnum::metadata(&mut registry);
     MyData::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }
 
 #[test]
@@ -164,5 +182,7 @@ fn type_aliases() {
 
     MyType::register_alias("MyType", &mut registry);
 
-    assert_snapshot!(go_away::registry_to_typescript_output(registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::TypeScriptType>(
+        &registry
+    ));
 }

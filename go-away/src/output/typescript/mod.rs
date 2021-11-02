@@ -4,11 +4,20 @@ use indenter::indented;
 
 pub use crate::types::*;
 
+/// An enum representing the possible top-level types in TypeScript
+///
+/// This shouldn't be instaniated directly but passed using turbofish operator
+/// to registry_to_output enabling it to write out in TypeScript
 pub enum TypeScriptType<'a> {
+    /// A struct variant
     Struct(&'a Struct),
+    /// A new type variant
     NewType(&'a NewType),
+    /// A type alias variant
     Alias(&'a Alias),
+    /// A simple enum variant (does not contain data)
     Enum(&'a Enum),
+    /// A union variant (enums with data)
     Union(&'a Union),
 }
 
@@ -16,7 +25,7 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match self {
             TypeScriptType::Struct(details) => {
-                writeln!(f, "type {} = {{", details.name)?;
+                writeln!(f, "export type {} = {{", details.name)?;
                 for field in &details.fields {
                     writeln!(indented(f), "{}", TypeScriptField(field))?;
                 }
@@ -25,7 +34,7 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
             TypeScriptType::NewType(details) => {
                 writeln!(
                     f,
-                    "type {} = {};",
+                    "export type {} = {};",
                     details.name,
                     details.inner.typescript_type()
                 )?;
@@ -33,13 +42,13 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
             TypeScriptType::Alias(details) => {
                 writeln!(
                     f,
-                    "type {} = {};",
+                    "export type {} = {};",
                     details.name,
                     details.inner.typescript_type()
                 )?;
             }
             TypeScriptType::Enum(details) => {
-                writeln!(f, "enum {} {{", details.name)?;
+                writeln!(f, "export enum {} {{", details.name)?;
                 for variant in &details.variants {
                     writeln!(
                         indented(f),
@@ -60,7 +69,12 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
                             variant.typescript_name()
                         ));
                     }
-                    writeln!(f, "type {} = {};", details.name, union_types.join(" | "))?;
+                    writeln!(
+                        f,
+                        "export type {} = {};",
+                        details.name,
+                        union_types.join(" | ")
+                    )?;
                 }
                 UnionRepresentation::InternallyTagged { tag } => {
                     let mut union_types: Vec<String> = vec![];
@@ -72,14 +86,24 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
                             variant.typescript_name()
                         ));
                     }
-                    writeln!(f, "type {} = {};", details.name, union_types.join(" | "))?;
+                    writeln!(
+                        f,
+                        "export type {} = {};",
+                        details.name,
+                        union_types.join(" | ")
+                    )?;
                 }
                 UnionRepresentation::Untagged => {
                     let mut union_types: Vec<String> = vec![];
                     for variant in &details.variants {
                         union_types.push(variant.typescript_name());
                     }
-                    writeln!(f, "type {} = {};", details.name, union_types.join(" | "))?;
+                    writeln!(
+                        f,
+                        "export type {} = {};",
+                        details.name,
+                        union_types.join(" | ")
+                    )?;
                 }
                 UnionRepresentation::AdjacentlyTagged { tag, content } => {
                     let mut union_types: Vec<String> = vec![];
@@ -92,7 +116,12 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
                             variant.typescript_name()
                         ));
                     }
-                    writeln!(f, "type {} = {};", details.name, union_types.join(" | "))?;
+                    writeln!(
+                        f,
+                        "export type {} = {};",
+                        details.name,
+                        union_types.join(" | ")
+                    )?;
                 }
             },
         }
@@ -185,7 +214,7 @@ mod tests {
             })
             .to_string(),
             @r###"
-        type MyStruct = {
+        export type MyStruct = {
             a_string: string;
             renamed_tho: number;
             also_renamed: boolean;
@@ -201,7 +230,7 @@ mod tests {
             name: "UserId".into(),
             inner: FieldType::Primitive(Primitive::String),
         })
-        .to_string(), @"type UserId = string;
+        .to_string(), @"export type UserId = string;
 ");
     }
 
@@ -216,8 +245,8 @@ mod tests {
                 name: "UserData".into()
             }))},
         })
-        .to_string(), @"type Users = Record<UserId, UserData>;
-    ");
+        .to_string(), @"export type Users = Record<UserId, UserData>;
+");
     }
 
     #[test]
@@ -231,7 +260,8 @@ mod tests {
             name: "UserData".into()
         }))},
     })
-    .to_string(), @"type Users = Record<UserId, UserData>;");
+    .to_string(), @"export type Users = Record<UserId, UserData>;
+");
     }
 
     #[test]
@@ -250,7 +280,7 @@ mod tests {
             ],
         })
         .to_string(), @r###"
-        enum FulfilmentType {
+        export enum FulfilmentType {
             Delivery = "DELIVERY",
             Collection = "COLLECTION",
         }
@@ -279,9 +309,8 @@ mod tests {
                 }
             ]
         })
-        .to_string(), @r###"
-        type MyUnion = { "VAR_ONE": VarOne } | { "VAR_TWO": VarTwo };
-		"###);
+        .to_string(), @r###"export type MyUnion = { "VAR_ONE": VarOne } | { "VAR_TWO": VarTwo };
+"###);
     }
 
     #[test]
@@ -308,9 +337,8 @@ mod tests {
                 }
             ]
         })
-        .to_string(), @r###"
-        type MyUnion = ({ "type": "VAR_ONE" } & VarOne) | ({ "type": "VAR_TWO" } & VarTwo);
-		"###);
+        .to_string(), @r###"export type MyUnion = ({ "type": "VAR_ONE" } & VarOne) | ({ "type": "VAR_TWO" } & VarTwo);
+"###);
     }
 
     #[test]
@@ -338,9 +366,8 @@ mod tests {
                 }
             ]
         })
-        .to_string(), @r###"
-        type MyUnion = { "type": "VAR_ONE", "data": VarOne } | { "type": "VAR_TWO", "data": VarTwo };
-		"###);
+        .to_string(), @r###"export type MyUnion = { "type": "VAR_ONE", "data": VarOne } | { "type": "VAR_TWO", "data": VarTwo };
+"###);
     }
 
     #[test]
@@ -365,9 +392,8 @@ mod tests {
                 }
             ]
         })
-        .to_string(), @r###"
-        type MyUnion = VarOne | VarTwo;
-    	"###);
+        .to_string(), @"export type MyUnion = VarOne | VarTwo;
+");
     }
 
     #[test]
@@ -392,9 +418,8 @@ mod tests {
                 }
             ]
         })
-        .to_string(), @r###"
-        type MyUnion = VarOne | null | VarTwo;
-    	"###);
+        .to_string(), @"export type MyUnion = VarOne | null | VarTwo;
+");
     }
 
     #[test]
