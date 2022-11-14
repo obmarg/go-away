@@ -1,0 +1,10 @@
+---
+source: go-away/src/output/swift/tests.rs
+expression: "SwiftType::Union(&Union {\n                name: \"MyUnion\".into(),\n                representation: UnionRepresentation::AdjacentlyTagged {\n                    tag: \"type\".into(),\n                    content: \"data\".into(),\n                },\n                variants: vec![UnionVariant\n                    {\n                        name : Some(\"VarOne\".into()), ty : FieldType ::\n                        Named(TypeRef { name : \"VarOne\".into() }), serialized_name :\n                        \"VAR_ONE\".into(),\n                    }, UnionVariant\n                    {\n                        name : Some(\"VarTwo\".into()), ty : FieldType ::\n                        Named(TypeRef { name : \"VarTwo\".into() }), serialized_name :\n                        \"VAR_TWO\".into(),\n                    }],\n            }).to_string()"
+---
+public enum MyUnion {
+    case varOne(VarOne)
+    case varTwo(VarTwo)
+}
+
+

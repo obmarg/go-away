@@ -15,7 +15,7 @@ fn test_struct_output() {
     let mut registry = TypeRegistry::new();
     MyData::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[derive(TypeMetadata)]
@@ -54,7 +54,7 @@ fn test_newtype_enum() {
     let mut registry = TypeRegistry::new();
     NewTypeEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[derive(TypeMetadata)]
@@ -69,7 +69,7 @@ fn test_struct_enum() {
     let mut registry = TypeRegistry::new();
     StructEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[derive(TypeMetadata)]
@@ -84,7 +84,7 @@ fn test_internally_tagged_tuple_enum() {
     let mut registry = TypeRegistry::new();
     InternallyTaggedTupleEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[derive(TypeMetadata)]
@@ -98,7 +98,7 @@ fn lifetimes_and_strs() {
     let mut registry = TypeRegistry::new();
     TypeWithLifetimes::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[test]
@@ -109,7 +109,7 @@ fn type_deduplication() {
     StructEnum::metadata(&mut registry);
     MyData::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[test]
@@ -120,6 +120,7 @@ fn type_aliases() {
 
     MyType::register_alias("MyType", &mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry), @"type MyType map[string]int
-");
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry), @r###"
+    typealias MyType = [String: Int64]
+    "###);
 }

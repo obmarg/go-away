@@ -1,0 +1,18 @@
+---
+source: go-away/tests/swift_output.rs
+expression: "go_away::registry_to_output::<go_away::SwiftType>(&registry)"
+---
+public struct TypeWithLifetimes: Hashable {
+    public var data: String
+    public var other: String
+
+    public init(
+        data: String,
+        other: String,
+    ) {
+        self.data = data
+        self.other = other
+    }
+}
+
+

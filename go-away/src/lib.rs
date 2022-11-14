@@ -44,7 +44,7 @@ pub mod types;
 
 pub use alias::TypeAlias;
 pub use metadata::TypeMetadata;
-pub use output::{GoType, TypeScriptType};
+pub use output::{GoType, SwiftType, TypeScriptType};
 pub use registry::TypeRegistry;
 pub use type_id::TypeId;
 
@@ -110,6 +110,18 @@ impl<'a> From<&'a registry::Type> for output::typescript::TypeScriptType<'a> {
             registry::Type::Union(inner) => output::typescript::TypeScriptType::Union(inner),
             registry::Type::NewType(inner) => output::typescript::TypeScriptType::NewType(inner),
             registry::Type::Alias(inner) => output::typescript::TypeScriptType::Alias(inner),
+        }
+    }
+}
+
+impl<'a> From<&'a registry::Type> for output::swift::SwiftType<'a> {
+    fn from(ty: &'a registry::Type) -> Self {
+        match ty {
+            registry::Type::Struct(inner) => SwiftType::Struct(inner),
+            registry::Type::Enum(inner) => SwiftType::Enum(inner),
+            registry::Type::Union(inner) => SwiftType::Union(inner),
+            registry::Type::NewType(inner) => SwiftType::NewType(inner),
+            registry::Type::Alias(inner) => SwiftType::Alias(inner),
         }
     }
 }

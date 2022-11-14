@@ -1,0 +1,57 @@
+---
+source: go-away/tests/swift_output.rs
+expression: "go_away::registry_to_output::<go_away::SwiftType>(&registry)"
+---
+public struct OptionTwo: Hashable {
+    public var foo: String
+    public var bar: Nested
+
+    public init(
+        foo: String,
+        bar: Nested,
+    ) {
+        self.foo = foo
+        self.bar = bar
+    }
+}
+
+public struct Nested: Hashable {
+    public var aString: String
+    public var anInt: Int64
+    public var fulfilmentType: FulfilmentType
+
+    public init(
+        aString: String,
+        anInt: Int64,
+        fulfilmentType: FulfilmentType,
+    ) {
+        self.aString = aString
+        self.anInt = anInt
+        self.fulfilmentType = fulfilmentType
+    }
+}
+
+public struct OptionOne: Hashable {
+    public var x: String
+    public var y: Int64
+
+    public init(
+        x: String,
+        y: Int64,
+    ) {
+        self.x = x
+        self.y = y
+    }
+}
+
+public enum StructEnum {
+    case optionOne(OptionOne)
+    case optionTwo(OptionTwo)
+}
+
+public enum FulfilmentType {
+    case delivery
+    case collection
+}
+
+
