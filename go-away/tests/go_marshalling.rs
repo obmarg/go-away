@@ -1,4 +1,4 @@
-#![allow(clippy::unit_arg, clippy::blacklisted_name)]
+#![allow(clippy::disallowed_names)]
 
 use std::{
     fmt::Debug,
@@ -169,7 +169,7 @@ where
     .unwrap();
 
     let process = Command::new("go")
-        .args(&["run", &path])
+        .args(["run", &path])
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
