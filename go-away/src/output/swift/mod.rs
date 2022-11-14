@@ -38,8 +38,7 @@ impl<'a> fmt::Display for SwiftType<'a> {
                 writeln!(f, "{struct_}")?;
             }
             SwiftType::NewType(details) => {
-                let struct_ =
-                    SwiftStruct::new(&details.name).with_field(&details.name, &details.inner);
+                let struct_ = SwiftStruct::newtype(&details.name, &details.inner);
                 writeln!(f, "{struct_}")?;
             }
             SwiftType::Alias(details) => {

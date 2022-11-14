@@ -13,6 +13,11 @@ public struct OptionTwo: Hashable {
         self.foo = foo
         self.bar = bar
     }
+
+    enum CodingKeys: String, CodingKey {
+        case foo = "foo"
+        case bar = "bar"
+    }
 }
 
 public struct Nested: Hashable {
@@ -29,6 +34,12 @@ public struct Nested: Hashable {
         self.anInt = anInt
         self.fulfilmentType = fulfilmentType
     }
+
+    enum CodingKeys: String, CodingKey {
+        case aString = "some_other_name"
+        case anInt = "an_int"
+        case fulfilmentType = "fulfilment_type"
+    }
 }
 
 public struct OptionOne: Hashable {
@@ -41,6 +52,11 @@ public struct OptionOne: Hashable {
     ) {
         self.x = x
         self.y = y
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case x = "x"
+        case y = "y"
     }
 }
 

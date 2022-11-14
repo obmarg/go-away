@@ -13,6 +13,11 @@ public struct TypeWithLifetimes: Hashable {
         self.data = data
         self.other = other
     }
+
+    enum CodingKeys: String, CodingKey {
+        case data = "data"
+        case other = "other"
+    }
 }
 
 

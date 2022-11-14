@@ -10,6 +10,10 @@ public struct Two: Hashable {
     ) {
         self.y = y
     }
+
+    enum CodingKeys: String, CodingKey {
+        case y = "y"
+    }
 }
 
 public struct One: Hashable {
@@ -19,6 +23,10 @@ public struct One: Hashable {
         x: Double,
     ) {
         self.x = x
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case x = "x"
     }
 }
 

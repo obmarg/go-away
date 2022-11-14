@@ -13,6 +13,11 @@ public struct MyData: Hashable {
         self.fieldOne = fieldOne
         self.nested = nested
     }
+
+    enum CodingKeys: String, CodingKey {
+        case fieldOne = "field_one"
+        case nested = "nested"
+    }
 }
 
 public struct Nested: Hashable {
@@ -28,6 +33,12 @@ public struct Nested: Hashable {
         self.aString = aString
         self.anInt = anInt
         self.fulfilmentType = fulfilmentType
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case aString = "some_other_name"
+        case anInt = "an_int"
+        case fulfilmentType = "fulfilment_type"
     }
 }
 

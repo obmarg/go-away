@@ -50,6 +50,13 @@ fn test_primitive_structs() {
             self.aBool = aBool
             self.aFloat = aFloat
         }
+
+        enum CodingKeys: String, CodingKey {
+            case aString = "a_string"
+            case anInt = "renamed_tho"
+            case aBool = "also_renamed"
+            case aFloat = "a_float"
+        }
     }
 
     "###
@@ -64,12 +71,28 @@ fn test_newtype_output() {
         })
         .to_string(), @r###"
     public struct UserId: Hashable {
-        public var userId: String
+        public var value: String
 
         public init(
-            userId: String,
+            value: String,
         ) {
-            self.userId = userId
+            self.value = value
+        }
+
+    }
+
+    extension UserId: Decodable {
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let value = try decoder.decode(String.self)
+            UserId(value)
+        }
+    }
+
+    extension UserId: Encodable {
+        func encode(to encoder: Encoder) throws {
+            var container = try encoder.singleValueContainer()
+            try container.encode(self.value)
         }
     }
 
