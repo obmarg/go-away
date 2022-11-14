@@ -33,15 +33,6 @@ impl<'a> SwiftStruct<'a> {
         }
     }
 
-    pub fn with_field(mut self, name: &'a str, ty: &'a FieldType) -> Self {
-        self.fields.push(SwiftField {
-            name: to_camel_case(name),
-            ty: ty.swift_type(),
-            serialized_name: None,
-        });
-        self
-    }
-
     pub fn with_fields(mut self, fields: &'a [types::Field]) -> Self {
         self.fields.extend(fields.iter().map(Into::into));
         self
@@ -66,7 +57,12 @@ impl From<&types::Field> for SwiftField {
 
 impl fmt::Display for SwiftStruct<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "public struct {}: Hashable {{", self.name)?;
+        write!(f, "public struct {}: ", self.name)?;
+        if self.newtype {
+            writeln!(f, "Hashable {{")?;
+        } else {
+            writeln!(f, "Hashable, Codable {{")?;
+        }
         {
             let f = &mut indented(f);
             for field in &self.fields {

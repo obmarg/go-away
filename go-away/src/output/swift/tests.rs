@@ -33,7 +33,7 @@ fn test_primitive_structs() {
         })
         .to_string(),
         @r###"
-    public struct MyStruct: Hashable {
+    public struct MyStruct: Hashable, Codable {
         public var aString: String
         public var anInt: Int64
         public var aBool: Bool

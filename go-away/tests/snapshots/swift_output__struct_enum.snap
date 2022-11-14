@@ -2,7 +2,7 @@
 source: go-away/tests/swift_output.rs
 expression: "go_away::registry_to_output::<go_away::SwiftType>(&registry)"
 ---
-public struct OptionTwo: Hashable {
+public struct OptionTwo: Hashable, Codable {
     public var foo: String
     public var bar: Nested
 
@@ -20,7 +20,7 @@ public struct OptionTwo: Hashable {
     }
 }
 
-public struct Nested: Hashable {
+public struct Nested: Hashable, Codable {
     public var aString: String
     public var anInt: Int64
     public var fulfilmentType: FulfilmentType
@@ -42,7 +42,7 @@ public struct Nested: Hashable {
     }
 }
 
-public struct OptionOne: Hashable {
+public struct OptionOne: Hashable, Codable {
     public var x: String
     public var y: Int64
 
