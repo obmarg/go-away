@@ -12,8 +12,11 @@ use serde::{Deserialize, Serialize};
 
 use go_away::{registry_to_output, TypeMetadata, TypeRegistry};
 
+/* TODO
 #[cfg(feature = "chrono")]
 use chrono::{DateTime, NaiveDateTime, Utc};
+
+*/
 
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type")]
@@ -93,12 +96,17 @@ enum StructEnum {
     OptionTwo { foo: String, bar: Nested },
 }
 
+/*
+
+TODO:
+
 #[cfg(feature = "chrono")]
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type")]
 enum DateTimeEnum {
     One { a: DateTime<chrono::Utc> },
 }
+*/
 
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 struct Nested {
@@ -114,6 +122,7 @@ enum FulfilmentType {
     Collection,
 }
 
+/* TODO:
 #[cfg(feature = "chrono")]
 #[test]
 fn test_datetime() {
@@ -125,6 +134,7 @@ fn test_datetime() {
         }],
     );
 }
+*/
 
 #[test]
 fn test_struct_enum() {
