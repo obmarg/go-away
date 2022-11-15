@@ -8,7 +8,7 @@ use crate::types::{self, FieldType};
 
 pub struct SwiftStruct<'a> {
     name: &'a str,
-    fields: Vec<SwiftField>,
+    fields: Vec<SwiftField<'a>>,
     newtype: bool,
 }
 
@@ -27,7 +27,7 @@ impl<'a> SwiftStruct<'a> {
             fields: vec![SwiftField {
                 name: "value".to_string(),
                 ty: ty.swift_type(),
-                serialized_name: None,
+                serde_name: "",
             }],
             newtype: true,
         }
@@ -39,55 +39,52 @@ impl<'a> SwiftStruct<'a> {
     }
 }
 
-struct SwiftField {
+struct SwiftField<'a> {
     name: String,
     ty: String,
-    serialized_name: Option<String>,
+    serde_name: &'a str,
 }
 
-impl From<&types::Field> for SwiftField {
-    fn from(val: &types::Field) -> Self {
+impl<'a> From<&'a types::Field> for SwiftField<'a> {
+    fn from(val: &'a types::Field) -> Self {
         SwiftField {
             name: to_camel_case(&val.name),
             ty: val.ty.swift_type(),
-            serialized_name: Some(val.serialized_name.clone()),
+            serde_name: &val.serialized_name,
         }
     }
 }
 
 impl fmt::Display for SwiftStruct<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "public struct {}: ", self.name)?;
-        if self.newtype {
-            writeln!(f, "Hashable {{")?;
+        let impls = if self.newtype {
+            "Hashable"
         } else {
-            writeln!(f, "Hashable, Codable {{")?;
-        }
+            "Hashable, Codable"
+        };
+        writeln!(f, "public struct {}: {impls} {{", self.name)?;
         {
             let f = &mut indented(f);
-            for field in &self.fields {
-                writeln!(f, "public var {}: {}", field.name, field.ty)?;
+            for SwiftField { name, ty, .. } in &self.fields {
+                writeln!(f, "public var {name}: {ty}")?;
             }
             writeln!(f, "\npublic init(")?;
-            for field in &self.fields {
-                writeln!(indented(f), "{}: {},", field.name, field.ty)?;
+            for SwiftField { name, ty, .. } in &self.fields {
+                writeln!(indented(f), "{name}: {ty},")?;
             }
             writeln!(f, ") {{")?;
-            for field in &self.fields {
-                let name = &field.name;
+            for SwiftField { name, .. } in &self.fields {
                 writeln!(indented(f), "self.{name} = {name}")?;
             }
             writeln!(f, "}}\n")?;
 
             if !self.newtype {
                 writeln!(f, "enum CodingKeys: String, CodingKey {{")?;
-                for field in &self.fields {
-                    writeln!(
-                        indented(f),
-                        r#"case {} = "{}""#,
-                        &field.name,
-                        field.serialized_name.as_ref().unwrap_or(&field.name)
-                    )?;
+                for SwiftField {
+                    name, serde_name, ..
+                } in &self.fields
+                {
+                    writeln!(indented(f), r#"case {name} = "{serde_name}""#,)?;
                 }
                 writeln!(f, "}}")?;
             }
