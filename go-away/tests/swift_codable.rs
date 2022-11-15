@@ -171,24 +171,11 @@ where
         &mut file,
         r#"
             import Foundation
-            import Darwin
 
             {swift_code}
 
-
-        var standardError = FileHandle.standardError
-
-        extension FileHandle : TextOutputStream {{
-        public func write(_ string: String) {{
-            guard let data = string.data(using: .utf8) else {{ return }}
-            self.write(data)
-        }}
-        }}
-
-
             while let line = readLine() {{
                 let line = line.trimmingCharacters(in: .whitespacesAndNewlines)
-                print(line,to:&standardError)
                 let data = line.data(using: .utf8)!
                 let input = try! JSONDecoder().decode({type_name}.self, from: data)
                 let output = String(decoding: try! JSONEncoder().encode(input), as: UTF8.self)
