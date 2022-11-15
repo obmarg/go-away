@@ -6,14 +6,13 @@ public struct Two: Hashable, Codable {
     public var y: Bool
 
     public init(
-        y: Bool,
-    ) {
+        y: Bool) {
         self.y = y
     }
 }
 
 extension Two {
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Codable {
         case y = "y"
     }
 }
@@ -22,14 +21,13 @@ public struct One: Hashable, Codable {
     public var x: Double
 
     public init(
-        x: Double,
-    ) {
+        x: Double) {
         self.x = x
     }
 }
 
 extension One {
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Codable {
         case x = "x"
     }
 }
@@ -37,50 +35,44 @@ extension One {
 public enum AdjacentlyTaggedTupleEnums {
     case optionOne(One)
     case optionTwo(Two)
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Codable {
         case optionOne = "OptionOne"
         case optionTwo = "OptionTwo"
     }
 }
 
 extension AdjacentlyTaggedTupleEnums: Decodable {
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         enum ContainerKeys: String, CodingKey {
             case tag = "type"
             case data = "data"
         }
-        let container = try decoder.container(ContainerKeys.self)
-        let key = try decoder.decode(AdjacentlyTaggedTupleEnums.CodingKeys.self, forKey: .tag)
+        let container = try decoder.container(keyedBy: ContainerKeys.self)
+        let key = try container.decode(AdjacentlyTaggedTupleEnums.CodingKeys.self, forKey: .tag)
         switch key {
             case .optionOne:
-                return try container.decode(One.self, forKey: .data)
-            }
+                self = .optionOne(try container.decode(One.self, forKey: .data))
             case .optionTwo:
-                return try container.decode(Two.self, forKey: .data)
-            }
-            default:
-                throw "Unknown variant"
+                self = .optionTwo(try container.decode(Two.self, forKey: .data))
         }
 
     }
 }
 
 extension AdjacentlyTaggedTupleEnums: Encodable {
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         enum ContainerKeys: String, CodingKey {
             case tag = "type"
-            case data = "data
+            case data = "data"
         }
-        let container = try encoder.container(ContainerKeys.self)
-        switch this {
-            case .optionOne(data):
-                try container.encode(AdjacentlyTaggedTupleEnums.CodingKeys.name, forKey: .tag)
+        var container = encoder.container(keyedBy: ContainerKeys.self)
+        switch self {
+            case .optionOne(let data):
+                try container.encode(AdjacentlyTaggedTupleEnums.CodingKeys.optionOne, forKey: .tag)
                 try container.encode(data, forKey: .data)
-            }
-            case .optionTwo(data):
-                try container.encode(AdjacentlyTaggedTupleEnums.CodingKeys.name, forKey: .tag)
+            case .optionTwo(let data):
+                try container.encode(AdjacentlyTaggedTupleEnums.CodingKeys.optionTwo, forKey: .tag)
                 try container.encode(data, forKey: .data)
-            }
         }
 
     }

@@ -1,7 +1,7 @@
 use std::fmt::{self, Write};
 
 use indenter::indented;
-use indoc::{formatdoc, writedoc};
+use indoc::formatdoc;
 
 use super::{codable::Codable, to_camel_case, CodingKey, CodingKeys};
 use crate::types::{self, FieldType};
@@ -70,10 +70,17 @@ impl fmt::Display for SwiftStruct<'_> {
                 writeln!(f, "public var {name}: {ty}")?;
             }
             writeln!(f, "\npublic init(")?;
-            for SwiftField { name, ty, .. } in &self.fields {
-                writeln!(indented(f), "{name}: {ty},")?;
-            }
+
+            let fields = self
+                .fields
+                .iter()
+                .map(|SwiftField { name, ty, .. }| format!("{name}: {ty}"))
+                .collect::<Vec<_>>()
+                .join(",\n");
+            write!(indented(f), "{fields}")?;
+
             writeln!(f, ") {{")?;
+
             for SwiftField { name, .. } in &self.fields {
                 writeln!(indented(f), "self.{name} = {name}")?;
             }

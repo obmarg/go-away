@@ -50,13 +50,13 @@ impl Display for Codable<'_> {
             f,
             r#"
                 extension {name}: Decodable {{
-                    init(from decoder: Decoder) throws {{
+                    public init(from decoder: Decoder) throws {{
                 {decodable_impl}
                     }}
                 }}
 
                 extension {name}: Encodable {{
-                    func encode(to encoder: Encoder) throws {{
+                    public func encode(to encoder: Encoder) throws {{
                 {encodable_impl}
                     }}
                 }}

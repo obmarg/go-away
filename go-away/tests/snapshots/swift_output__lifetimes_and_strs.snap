@@ -8,15 +8,14 @@ public struct TypeWithLifetimes: Hashable, Codable {
 
     public init(
         data: String,
-        other: String,
-    ) {
+        other: String) {
         self.data = data
         self.other = other
     }
 }
 
 extension TypeWithLifetimes {
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Codable {
         case data = "data"
         case other = "other"
     }

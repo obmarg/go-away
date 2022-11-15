@@ -43,8 +43,7 @@ fn test_primitive_structs() {
             aString: String,
             anInt: Int64,
             aBool: Bool,
-            aFloat: Double,
-        ) {
+            aFloat: Double) {
             self.aString = aString
             self.anInt = anInt
             self.aBool = aBool
@@ -53,7 +52,7 @@ fn test_primitive_structs() {
     }
 
     extension MyStruct {
-        enum CodingKeys: String, CodingKey {
+        enum CodingKeys: String, CodingKey, Codable {
             case aString = "a_string"
             case anInt = "renamed_tho"
             case aBool = "also_renamed"
@@ -76,15 +75,14 @@ fn test_newtype_output() {
         public var value: String
 
         public init(
-            value: String,
-        ) {
+            value: String) {
             self.value = value
         }
     }
 
 
     extension UserId: Decodable {
-        init(from decoder: Decoder) throws {
+        public init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try decoder.decode(String.self)
             UserId(value)
@@ -93,7 +91,7 @@ fn test_newtype_output() {
     }
 
     extension UserId: Encodable {
-        func encode(to encoder: Encoder) throws {
+        public func encode(to encoder: Encoder) throws {
             var container = try encoder.singleValueContainer()
             try container.encode(self.value)
 
@@ -120,13 +118,9 @@ fn test_enum_output() {
             ],
         })
         .to_string(), @r###"
-    public enum FulfilmentType : Codable {
-        case delivery
-        case collection
-        enum CodingKeys: String, CodingKey {
-            case delivery = "DELIVERY"
-            case collection = "COLLECTION"
-        }
+    public enum FulfilmentType : String, Codable {
+        case delivery = "DELIVERY"
+        case collection = "COLLECTION"
     }
 
 

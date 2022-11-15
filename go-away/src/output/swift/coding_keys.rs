@@ -18,6 +18,7 @@ impl<'a> CodingKeys<'a> {
         Default::default()
     }
 
+    #[allow(dead_code)]
     pub fn with_name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
@@ -37,7 +38,7 @@ impl fmt::Display for CodingKeys<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let name = self.name.unwrap_or("CodingKeys");
 
-        writeln!(f, "enum {name}: String, CodingKey {{")?;
+        writeln!(f, "enum {name}: String, CodingKey, Codable {{")?;
         for CodingKey { name, serde_name } in &self.fields {
             writeln!(indented(f), r#"case {name} = "{serde_name}""#,)?;
         }

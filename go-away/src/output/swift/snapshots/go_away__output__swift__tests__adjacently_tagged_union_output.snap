@@ -5,50 +5,44 @@ expression: "SwiftType::Union(&types::Union {\n                name: \"MyUnion\"
 public enum MyUnion {
     case varOne(VarOne)
     case varTwo(VarTwo)
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Codable {
         case varOne = "VAR_ONE"
         case varTwo = "VAR_TWO"
     }
 }
 
 extension MyUnion: Decodable {
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         enum ContainerKeys: String, CodingKey {
             case tag = "type"
             case data = "data"
         }
-        let container = try decoder.container(ContainerKeys.self)
-        let key = try decoder.decode(MyUnion.CodingKeys.self, forKey: .tag)
+        let container = try decoder.container(keyedBy: ContainerKeys.self)
+        let key = try container.decode(MyUnion.CodingKeys.self, forKey: .tag)
         switch key {
             case .varOne:
-                return try container.decode(VarOne.self, forKey: .data)
-            }
+                self = .varOne(try container.decode(VarOne.self, forKey: .data))
             case .varTwo:
-                return try container.decode(VarTwo.self, forKey: .data)
-            }
-            default:
-                throw "Unknown variant"
+                self = .varTwo(try container.decode(VarTwo.self, forKey: .data))
         }
 
     }
 }
 
 extension MyUnion: Encodable {
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         enum ContainerKeys: String, CodingKey {
             case tag = "type"
-            case data = "data
+            case data = "data"
         }
-        let container = try encoder.container(ContainerKeys.self)
-        switch this {
-            case .varOne(data):
-                try container.encode(MyUnion.CodingKeys.name, forKey: .tag)
+        var container = encoder.container(keyedBy: ContainerKeys.self)
+        switch self {
+            case .varOne(let data):
+                try container.encode(MyUnion.CodingKeys.varOne, forKey: .tag)
                 try container.encode(data, forKey: .data)
-            }
-            case .varTwo(data):
-                try container.encode(MyUnion.CodingKeys.name, forKey: .tag)
+            case .varTwo(let data):
+                try container.encode(MyUnion.CodingKeys.varTwo, forKey: .tag)
                 try container.encode(data, forKey: .data)
-            }
         }
 
     }

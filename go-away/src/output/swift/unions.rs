@@ -132,15 +132,15 @@ impl fmt::Display for ExternallyTaggedEncodable<'_> {
 
         writeln!(
             f,
-            "let container = try encoder.container({coding_keys}.self)"
+            "var container = encoder.container(keyedBy: {coding_keys}.self)"
         )?;
         writeln!(f, "switch self {{")?;
         writedoc_for!(
             indented(f),
             Variant { name, ..  } in variants.iter(),
             r#"
-                        case .{name}(data):
-                            return container.encode(data, forKey: .{name})
+                        case .{name}(let data):
+                            return try container.encode(data, forKey: .{name})
                     "#
         );
         write!(f, "}}")
@@ -159,18 +159,27 @@ impl fmt::Display for ExternallyTaggedDecodable<'_> {
 
         writeln!(
             f,
-            "let container = try decoder.container({coding_keys}.self)"
+            "let container = try decoder.container(keyedBy: {coding_keys}.self)"
         )?;
         writedoc_for!(
-            f,
+            &mut *f,
             Variant { name, ty, ..  } in variants.iter(),
             r#"
                 if (container.contains(.{name})) {{
-                    return try container.decode({ty}.self, forKey: .{name})
+                    self = .{name}(try container.decode({ty}.self, forKey: .{name}))
+                    return
                 }}
             "#
         );
-        Ok(())
+        writedoc!(
+            f,
+            r#"
+                throw NSError(
+                    domain: "",
+                    code: 400,
+                    userInfo: [ NSLocalizedDescriptionKey: "Unknown variant of {name}"]
+                )"#
+        )
     }
 }
 
@@ -208,8 +217,8 @@ impl fmt::Display for InternallyTaggedDecodable<'_> {
                 enum TagCoding: String, CodingKey {{
                     case tag = "{tag}"
                 }}
-                let keyContainer = try decoder.container(TagCoding.self)
-                let key = try decoder.decode({coding_keys}.self, forKey: .tag)
+                let keyContainer = try decoder.container(keyedBy: TagCoding.self)
+                let key = try keyContainer.decode({coding_keys}.self, forKey: .tag)
                 switch key {{
             "#
         )?;
@@ -220,18 +229,10 @@ impl fmt::Display for InternallyTaggedDecodable<'_> {
                 case .{name}:
                     // Not 100% sure this'll work but
                     let container = try decoder.singleValueContainer()
-                    return try container.decode({ty}.self)
-                }}
+                    self = .{name}(try container.decode({ty}.self))
             "#
         );
-        writedoc!(
-            f,
-            r#"
-                    default:
-                        throw "Unknown variant"
-                }}
-            "#
-        )
+        writeln!(f, "}}")
     }
 }
 
@@ -258,20 +259,19 @@ impl fmt::Display for AdjacentlyTaggedEncodable<'_> {
             r#"
                 enum ContainerKeys: String, CodingKey {{
                     case tag = "{tag}"
-                    case data = "{content}
+                    case data = "{content}"
                 }}
-                let container = try encoder.container(ContainerKeys.self)
-                switch this {{
+                var container = encoder.container(keyedBy: ContainerKeys.self)
+                switch self {{
             "#
         )?;
         writedoc_for!(
             indented(f),
             Variant { name,  ..  } in *variants,
             r#"
-                case .{name}(data):
-                    try container.encode({coding_keys}.name, forKey: .tag)
+                case .{name}(let data):
+                    try container.encode({coding_keys}.{name}, forKey: .tag)
                     try container.encode(data, forKey: .data)
-                }}
             "#
         );
         writeln!(f, "}}")
@@ -302,8 +302,8 @@ impl fmt::Display for AdjacentlyTaggedDecodable<'_> {
                     case tag = "{tag}"
                     case data = "{content}"
                 }}
-                let container = try decoder.container(ContainerKeys.self)
-                let key = try decoder.decode({coding_keys}.self, forKey: .tag)
+                let container = try decoder.container(keyedBy: ContainerKeys.self)
+                let key = try container.decode({coding_keys}.self, forKey: .tag)
                 switch key {{
             "#
         )?;
@@ -312,17 +312,9 @@ impl fmt::Display for AdjacentlyTaggedDecodable<'_> {
             Variant { name, ty, ..  } in *variants,
             r#"
                 case .{name}:
-                    return try container.decode({ty}.self, forKey: .data)
-                }}
+                    self = .{name}(try container.decode({ty}.self, forKey: .data))
             "#
         );
-        writedoc!(
-            f,
-            r#"
-                    default:
-                        throw "Unknown variant"
-                }}
-            "#
-        )
+        writeln!(f, "}}")
     }
 }

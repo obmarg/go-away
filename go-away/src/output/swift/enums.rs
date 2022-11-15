@@ -1,9 +1,9 @@
 use crate::{
     output::prelude::*,
-    types::{self, UnionRepresentation},
+    types::{self},
 };
 
-use super::{to_camel_case, CodingKey, CodingKeys};
+use super::{to_camel_case, CodingKey};
 
 pub struct Enum<'a> {
     name: &'a str,
@@ -41,10 +41,8 @@ impl<'a> From<&'a types::EnumVariant> for Variant<'a> {
 impl fmt::Display for Enum<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let name = &self.name;
-        writeln!(f, "public enum {name} : Codable {{")?;
-        writeln_for!(indented(f), Variant{ name, ..} in &self.variants, "case {name}");
-        let coding_keys = CodingKeys::new().with_fields(&self.variants);
-        writeln!(indented(f), "{coding_keys}")?;
+        writeln!(f, "public enum {name} : String, Codable {{")?;
+        writeln_for!(indented(f), Variant{name, serde_name } in &self.variants, r#"case {name} = "{serde_name}""#);
         writeln!(f, "}}\n")
     }
 }

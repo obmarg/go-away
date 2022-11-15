@@ -6,14 +6,13 @@ public struct Two: Hashable, Codable {
     public var y: Bool
 
     public init(
-        y: Bool,
-    ) {
+        y: Bool) {
         self.y = y
     }
 }
 
 extension Two {
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Codable {
         case y = "y"
     }
 }
@@ -22,14 +21,13 @@ public struct One: Hashable, Codable {
     public var x: Double
 
     public init(
-        x: Double,
-    ) {
+        x: Double) {
         self.x = x
     }
 }
 
 extension One {
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Codable {
         case x = "x"
     }
 }
@@ -37,33 +35,39 @@ extension One {
 public enum ExternallyTaggedTupleEnum {
     case one(One)
     case two(Two)
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Codable {
         case one = "One"
         case two = "Two"
     }
 }
 
 extension ExternallyTaggedTupleEnum: Decodable {
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(ExternallyTaggedTupleEnum.CodingKeys.self)
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: ExternallyTaggedTupleEnum.CodingKeys.self)
         if (container.contains(.one)) {
-            return try container.decode(One.self, forKey: .one)
+            self = .one(try container.decode(One.self, forKey: .one))
+            return
         }
         if (container.contains(.two)) {
-            return try container.decode(Two.self, forKey: .two)
+            self = .two(try container.decode(Two.self, forKey: .two))
+            return
         }
-
+        throw NSError(
+            domain: "",
+            code: 400,
+            userInfo: [ NSLocalizedDescriptionKey: "Unknown variant of ExternallyTaggedTupleEnum"]
+        )
     }
 }
 
 extension ExternallyTaggedTupleEnum: Encodable {
-    func encode(to encoder: Encoder) throws {
-        let container = try encoder.container(ExternallyTaggedTupleEnum.CodingKeys.self)
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: ExternallyTaggedTupleEnum.CodingKeys.self)
         switch self {
-            case .one(data):
-                return container.encode(data, forKey: .one)
-            case .two(data):
-                return container.encode(data, forKey: .two)
+            case .one(let data):
+                return try container.encode(data, forKey: .one)
+            case .two(let data):
+                return try container.encode(data, forKey: .two)
         }
     }
 }
