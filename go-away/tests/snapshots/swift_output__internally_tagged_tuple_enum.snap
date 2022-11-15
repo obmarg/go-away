@@ -10,7 +10,9 @@ public struct Two: Hashable, Codable {
     ) {
         self.y = y
     }
+}
 
+extension Two {
     enum CodingKeys: String, CodingKey {
         case y = "y"
     }
@@ -24,7 +26,9 @@ public struct One: Hashable, Codable {
     ) {
         self.x = x
     }
+}
 
+extension One {
     enum CodingKeys: String, CodingKey {
         case x = "x"
     }

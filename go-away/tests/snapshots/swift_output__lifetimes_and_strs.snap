@@ -13,7 +13,9 @@ public struct TypeWithLifetimes: Hashable, Codable {
         self.data = data
         self.other = other
     }
+}
 
+extension TypeWithLifetimes {
     enum CodingKeys: String, CodingKey {
         case data = "data"
         case other = "other"

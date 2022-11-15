@@ -1,15 +1,22 @@
-use std::fmt::{self, Write};
+use crate::{
+    output::{prelude::*, swift::enums::Enum},
+    types::{self, Alias, Field, NewType, Struct},
+};
 
-use indenter::indented;
-
-use crate::types::{Alias, Enum, Field, NewType, Struct, Union};
-
-use self::structs::SwiftStruct;
+use self::{
+    coding_keys::{CodingKey, CodingKeys},
+    structs::SwiftStruct,
+    unions::Union,
+};
 
 use super::go::FieldType;
 
+mod coding_keys;
+mod enums;
 mod structs;
+mod unions;
 
+mod codable;
 #[cfg(test)]
 mod tests;
 
@@ -25,9 +32,9 @@ pub enum SwiftType<'a> {
     /// A type alias variant
     Alias(&'a Alias),
     /// A simple enum variant (does not contain data)
-    Enum(&'a Enum),
+    Enum(&'a types::Enum),
     /// A union variant (enums with data)
-    Union(&'a Union),
+    Union(&'a types::Union),
 }
 
 impl<'a> fmt::Display for SwiftType<'a> {
@@ -50,30 +57,13 @@ impl<'a> fmt::Display for SwiftType<'a> {
                 )?;
             }
             SwiftType::Enum(details) => {
-                writeln!(f, "public enum {} {{", details.name)?;
-                for variant in &details.variants {
-                    writeln!(indented(f), "case {}", to_camel_case(&variant.name),)?;
-                }
-                writeln!(f, "}}\n")?;
-                // TODO: encodable/decodable etc.
+                let enum_ = Enum::new(&details.name).with_variants(&details.variants);
+                writeln!(f, "{enum_}")?;
             }
             SwiftType::Union(details) => {
-                writeln!(f, "public enum {} {{", details.name)?;
-                for variant in &details.variants {
-                    let name = variant
-                        .name
-                        .as_deref()
-                        .expect("variants to have a name.  not sure why this is an option...?");
-
-                    writeln!(
-                        indented(f),
-                        "case {}({})",
-                        to_camel_case(name),
-                        variant.ty.swift_type()
-                    )?;
-                }
-                // TODO: encodable/decodable etc.
-                writeln!(f, "}}\n")?;
+                let union_ = Union::new(&details.name, details.representation.clone())
+                    .with_variants(&details.variants);
+                writeln!(f, "{union_}")?;
             }
         }
         Ok(())

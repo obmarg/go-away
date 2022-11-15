@@ -13,28 +13,12 @@ public struct MyData: Hashable, Codable {
         self.fieldOne = fieldOne
         self.nested = nested
     }
+}
 
+extension MyData {
     enum CodingKeys: String, CodingKey {
         case fieldOne = "field_one"
         case nested = "nested"
-    }
-}
-
-public struct OptionTwo: Hashable, Codable {
-    public var foo: String
-    public var bar: Nested
-
-    public init(
-        foo: String,
-        bar: Nested,
-    ) {
-        self.foo = foo
-        self.bar = bar
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case foo = "foo"
-        case bar = "bar"
     }
 }
 
@@ -52,7 +36,9 @@ public struct Nested: Hashable, Codable {
         self.anInt = anInt
         self.fulfilmentType = fulfilmentType
     }
+}
 
+extension Nested {
     enum CodingKeys: String, CodingKey {
         case aString = "some_other_name"
         case anInt = "an_int"
@@ -60,32 +46,14 @@ public struct Nested: Hashable, Codable {
     }
 }
 
-public struct OptionOne: Hashable, Codable {
-    public var x: String
-    public var y: Int64
-
-    public init(
-        x: String,
-        y: Int64,
-    ) {
-        self.x = x
-        self.y = y
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case x = "x"
-        case y = "y"
-    }
-}
-
-public enum StructEnum {
-    case optionOne(OptionOne)
-    case optionTwo(OptionTwo)
-}
-
-public enum FulfilmentType {
+public enum FulfilmentType : Codable {
     case delivery
     case collection
+    enum CodingKeys: String, CodingKey {
+        case delivery = "Delivery"
+        case collection = "Collection"
+    }
 }
+
 
 

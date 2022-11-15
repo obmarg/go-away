@@ -98,7 +98,7 @@ pub struct UnionVariant {
 /// The serialized representation of the union type
 ///
 /// See https://serde.rs/enum-representations.html for details
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum UnionRepresentation {
     /// An adjacently tagged representation
     AdjacentlyTagged {

@@ -1,9 +1,9 @@
 use std::fmt::{self, Write};
 
 use indenter::indented;
-use indoc::writedoc;
+use indoc::{formatdoc, writedoc};
 
-use super::to_camel_case;
+use super::{codable::Codable, to_camel_case, CodingKey, CodingKeys};
 use crate::types::{self, FieldType};
 
 pub struct SwiftStruct<'a> {
@@ -57,12 +57,13 @@ impl<'a> From<&'a types::Field> for SwiftField<'a> {
 
 impl fmt::Display for SwiftStruct<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let name = self.name;
         let impls = if self.newtype {
             "Hashable"
         } else {
             "Hashable, Codable"
         };
-        writeln!(f, "public struct {}: {impls} {{", self.name)?;
+        writeln!(f, "public struct {name}: {impls} {{")?;
         {
             let f = &mut indented(f);
             for SwiftField { name, ty, .. } in &self.fields {
@@ -76,51 +77,48 @@ impl fmt::Display for SwiftStruct<'_> {
             for SwiftField { name, .. } in &self.fields {
                 writeln!(indented(f), "self.{name} = {name}")?;
             }
-            writeln!(f, "}}\n")?;
-
-            if !self.newtype {
-                writeln!(f, "enum CodingKeys: String, CodingKey {{")?;
-                for SwiftField {
-                    name, serde_name, ..
-                } in &self.fields
-                {
-                    writeln!(indented(f), r#"case {name} = "{serde_name}""#,)?;
-                }
-                writeln!(f, "}}")?;
-            }
+            writeln!(f, "}}")?;
         }
-        writeln!(f, "}}")?;
+        writeln!(f, "}}\n")?;
 
-        if self.newtype {
-            let name = self.name;
+        if !self.newtype {
+            let coding_keys = CodingKeys::new().with_fields(&self.fields);
+            writeln!(f, "extension {name} {{")?;
+            writeln!(indented(f), "{coding_keys}")?;
+            writeln!(f, "}}")?;
+        } else {
             let field = self
                 .fields
                 .first()
                 .expect("new types to have a single field");
             let ty = &field.ty;
             let field_name = &field.name;
-            writedoc!(
-                f,
-                r#"
-
-                    extension {name}: Decodable {{
-                        init(from decoder: Decoder) throws {{
-                            let container = try decoder.singleValueContainer()
-                            let value = try decoder.decode({ty}.self)
-                            {name}(value)
-                        }}
-                    }}
-
-                    extension {name}: Encodable {{
-                        func encode(to encoder: Encoder) throws {{
-                            var container = try encoder.singleValueContainer()
-                            try container.encode(self.{field_name})
-                        }}
-                    }}
-                "#,
-            )?;
+            let codable = Codable::new(self.name)
+                .with_decodable(formatdoc!(
+                    r#"
+                        let container = try decoder.singleValueContainer()
+                        let value = try decoder.decode({ty}.self)
+                        {name}(value)
+                    "#
+                ))
+                .with_encodable(formatdoc!(
+                    r#"
+                        var container = try encoder.singleValueContainer()
+                        try container.encode(self.{field_name})
+                    "#
+                ));
+            writeln!(f, "\n{codable}")?;
         }
 
         Ok(())
+    }
+}
+
+impl<'a> From<&'a SwiftField<'a>> for CodingKey<'a> {
+    fn from(field: &'a SwiftField<'a>) -> Self {
+        CodingKey {
+            name: &field.name,
+            serde_name: field.serde_name,
+        }
     }
 }

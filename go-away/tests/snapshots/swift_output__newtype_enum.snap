@@ -10,7 +10,9 @@ public struct Two: Hashable, Codable {
     ) {
         self.y = y
     }
+}
 
+extension Two {
     enum CodingKeys: String, CodingKey {
         case y = "y"
     }
@@ -24,7 +26,9 @@ public struct One: Hashable, Codable {
     ) {
         self.x = x
     }
+}
 
+extension One {
     enum CodingKeys: String, CodingKey {
         case x = "x"
     }
@@ -33,6 +37,36 @@ public struct One: Hashable, Codable {
 public enum NewTypeEnum {
     case optionOne(One)
     case optionTwo(Two)
+    enum CodingKeys: String, CodingKey {
+        case optionOne = "OptionOne"
+        case optionTwo = "OptionTwo"
+    }
 }
+
+extension NewTypeEnum: Decodable {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(NewTypeEnum.CodingKeys.self)
+        if (container.contains(.optionOne)) {
+            return try container.decode(One.self, forKey: .optionOne)
+        }
+        if (container.contains(.optionTwo)) {
+            return try container.decode(Two.self, forKey: .optionTwo)
+        }
+
+    }
+}
+
+extension NewTypeEnum: Encodable {
+    func encode(to encoder: Encoder) throws {
+        let container = try encoder.container(NewTypeEnum.CodingKeys.self)
+        switch self {
+            case .optionOne(data):
+                return container.encode(data, forKey: .optionOne)
+            case .optionTwo(data):
+                return container.encode(data, forKey: .optionTwo)
+        }
+    }
+}
+
 
 

@@ -50,7 +50,9 @@ fn test_primitive_structs() {
             self.aBool = aBool
             self.aFloat = aFloat
         }
+    }
 
+    extension MyStruct {
         enum CodingKeys: String, CodingKey {
             case aString = "a_string"
             case anInt = "renamed_tho"
@@ -78,14 +80,15 @@ fn test_newtype_output() {
         ) {
             self.value = value
         }
-
     }
+
 
     extension UserId: Decodable {
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             let value = try decoder.decode(String.self)
             UserId(value)
+
         }
     }
 
@@ -93,15 +96,17 @@ fn test_newtype_output() {
         func encode(to encoder: Encoder) throws {
             var container = try encoder.singleValueContainer()
             try container.encode(self.value)
+
         }
     }
+
 
     "###);
 }
 
 #[test]
 fn test_enum_output() {
-    assert_snapshot!(SwiftType::Enum(&Enum {
+    assert_snapshot!(SwiftType::Enum(&types::Enum {
             name: "FulfilmentType".into(),
             variants: vec![
                 EnumVariant {
@@ -115,17 +120,22 @@ fn test_enum_output() {
             ],
         })
         .to_string(), @r###"
-    public enum FulfilmentType {
+    public enum FulfilmentType : Codable {
         case delivery
         case collection
+        enum CodingKeys: String, CodingKey {
+            case delivery = "DELIVERY"
+            case collection = "COLLECTION"
+        }
     }
+
 
     "###);
 }
 
 #[test]
 fn test_adjacently_tagged_union_output() {
-    assert_snapshot!(SwiftType::Union(&Union {
+    assert_snapshot!(SwiftType::Union(&types::Union {
         name: "MyUnion".into(),
         representation: UnionRepresentation::AdjacentlyTagged {
             tag: "type".into(),

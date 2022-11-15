@@ -1,0 +1,72 @@
+---
+source: go-away/tests/swift_output.rs
+expression: "go_away::registry_to_output::<go_away::SwiftType>(&registry)"
+---
+public struct Two: Hashable, Codable {
+    public var y: Bool
+
+    public init(
+        y: Bool,
+    ) {
+        self.y = y
+    }
+}
+
+extension Two {
+    enum CodingKeys: String, CodingKey {
+        case y = "y"
+    }
+}
+
+public struct One: Hashable, Codable {
+    public var x: Double
+
+    public init(
+        x: Double,
+    ) {
+        self.x = x
+    }
+}
+
+extension One {
+    enum CodingKeys: String, CodingKey {
+        case x = "x"
+    }
+}
+
+public enum ExternallyTaggedTupleEnum {
+    case one(One)
+    case two(Two)
+    enum CodingKeys: String, CodingKey {
+        case one = "One"
+        case two = "Two"
+    }
+}
+
+extension ExternallyTaggedTupleEnum: Decodable {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(ExternallyTaggedTupleEnum.CodingKeys.self)
+        if (container.contains(.one)) {
+            return try container.decode(One.self, forKey: .one)
+        }
+        if (container.contains(.two)) {
+            return try container.decode(Two.self, forKey: .two)
+        }
+
+    }
+}
+
+extension ExternallyTaggedTupleEnum: Encodable {
+    func encode(to encoder: Encoder) throws {
+        let container = try encoder.container(ExternallyTaggedTupleEnum.CodingKeys.self)
+        switch self {
+            case .one(data):
+                return container.encode(data, forKey: .one)
+            case .two(data):
+                return container.encode(data, forKey: .two)
+        }
+    }
+}
+
+
+
