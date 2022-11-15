@@ -15,12 +15,12 @@ fn test_struct_output() {
     let mut registry = TypeRegistry::new();
     MyData::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[derive(TypeMetadata)]
 #[serde(tag = "type", content = "data")]
-enum NewTypeEnum {
+enum AdjacentlyTaggedTupleEnums {
     OptionOne(One),
     OptionTwo(Two),
 }
@@ -50,12 +50,15 @@ struct Two {
 }
 
 #[test]
-fn test_newtype_enum() {
+fn test_adjacently_tagged_tuple_enums() {
     let mut registry = TypeRegistry::new();
-    NewTypeEnum::metadata(&mut registry);
+    AdjacentlyTaggedTupleEnums::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
+
+/*
+// TODO: Add StructEnum support...
 
 #[derive(TypeMetadata)]
 #[serde(tag = "type", content = "data")]
@@ -69,8 +72,13 @@ fn test_struct_enum() {
     let mut registry = TypeRegistry::new();
     StructEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
+*/
+
+/*
+
+// TODO: Finish this.
 
 #[derive(TypeMetadata)]
 #[serde(tag = "type")]
@@ -84,7 +92,22 @@ fn test_internally_tagged_tuple_enum() {
     let mut registry = TypeRegistry::new();
     InternallyTaggedTupleEnum::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
+}
+*/
+
+#[derive(TypeMetadata)]
+enum ExternallyTaggedTupleEnum {
+    One(One),
+    Two(Two),
+}
+
+#[test]
+fn test_externally_tagged_tuple_enum() {
+    let mut registry = TypeRegistry::new();
+    ExternallyTaggedTupleEnum::metadata(&mut registry);
+
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[derive(TypeMetadata)]
@@ -98,7 +121,7 @@ fn lifetimes_and_strs() {
     let mut registry = TypeRegistry::new();
     TypeWithLifetimes::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[test]
@@ -106,10 +129,11 @@ fn type_deduplication() {
     let mut registry = TypeRegistry::new();
 
     // These both contain `Nested` so there should be one `Nested` type in the output
-    StructEnum::metadata(&mut registry);
+    //StructEnum::metadata(&mut registry);
+    Nested::metadata(&mut registry);
     MyData::metadata(&mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry));
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry));
 }
 
 #[test]
@@ -120,6 +144,7 @@ fn type_aliases() {
 
     MyType::register_alias("MyType", &mut registry);
 
-    assert_snapshot!(go_away::registry_to_output::<go_away::GoType>(&registry), @"type MyType map[string]int
-");
+    assert_snapshot!(go_away::registry_to_output::<go_away::SwiftType>(&registry), @r###"
+    typealias MyType = [String: Int64]
+    "###);
 }

@@ -1,0 +1,53 @@
+---
+source: go-away/tests/swift_output.rs
+expression: "go_away::registry_to_output::<go_away::SwiftType>(&registry)"
+---
+public struct MyData: Hashable, Codable {
+    public var fieldOne: String
+    public var nested: Nested
+
+    public init(
+        fieldOne: String,
+        nested: Nested) {
+        self.fieldOne = fieldOne
+        self.nested = nested
+    }
+}
+
+extension MyData {
+    enum CodingKeys: String, CodingKey, Codable {
+        case fieldOne = "field_one"
+        case nested = "nested"
+    }
+}
+
+public struct Nested: Hashable, Codable {
+    public var aString: String
+    public var anInt: Int64
+    public var fulfilmentType: FulfilmentType
+
+    public init(
+        aString: String,
+        anInt: Int64,
+        fulfilmentType: FulfilmentType) {
+        self.aString = aString
+        self.anInt = anInt
+        self.fulfilmentType = fulfilmentType
+    }
+}
+
+extension Nested {
+    enum CodingKeys: String, CodingKey, Codable {
+        case aString = "some_other_name"
+        case anInt = "an_int"
+        case fulfilmentType = "fulfilment_type"
+    }
+}
+
+public enum FulfilmentType : String, Codable {
+    case delivery = "Delivery"
+    case collection = "Collection"
+}
+
+
+

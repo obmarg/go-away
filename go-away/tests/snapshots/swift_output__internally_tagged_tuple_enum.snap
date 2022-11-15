@@ -1,0 +1,42 @@
+---
+source: go-away/tests/swift_output.rs
+expression: "go_away::registry_to_output::<go_away::SwiftType>(&registry)"
+---
+public struct Two: Hashable, Codable {
+    public var y: Bool
+
+    public init(
+        y: Bool,
+    ) {
+        self.y = y
+    }
+}
+
+extension Two {
+    enum CodingKeys: String, CodingKey {
+        case y = "y"
+    }
+}
+
+public struct One: Hashable, Codable {
+    public var x: Double
+
+    public init(
+        x: Double,
+    ) {
+        self.x = x
+    }
+}
+
+extension One {
+    enum CodingKeys: String, CodingKey {
+        case x = "x"
+    }
+}
+
+public enum InternallyTaggedTupleEnum {
+    case one(One)
+    case two(Two)
+}
+
+

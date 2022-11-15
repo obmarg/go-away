@@ -1,0 +1,76 @@
+---
+source: go-away/tests/swift_output.rs
+expression: "go_away::registry_to_output::<go_away::SwiftType>(&registry)"
+---
+public struct Two: Hashable, Codable {
+    public var y: Bool
+
+    public init(
+        y: Bool) {
+        self.y = y
+    }
+}
+
+extension Two {
+    enum CodingKeys: String, CodingKey, Codable {
+        case y = "y"
+    }
+}
+
+public struct One: Hashable, Codable {
+    public var x: Double
+
+    public init(
+        x: Double) {
+        self.x = x
+    }
+}
+
+extension One {
+    enum CodingKeys: String, CodingKey, Codable {
+        case x = "x"
+    }
+}
+
+public enum ExternallyTaggedTupleEnum {
+    case one(One)
+    case two(Two)
+    enum CodingKeys: String, CodingKey, Codable {
+        case one = "One"
+        case two = "Two"
+    }
+}
+
+extension ExternallyTaggedTupleEnum: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: ExternallyTaggedTupleEnum.CodingKeys.self)
+        if (container.contains(.one)) {
+            self = .one(try container.decode(One.self, forKey: .one))
+            return
+        }
+        if (container.contains(.two)) {
+            self = .two(try container.decode(Two.self, forKey: .two))
+            return
+        }
+        throw NSError(
+            domain: "",
+            code: 400,
+            userInfo: [ NSLocalizedDescriptionKey: "Unknown variant of ExternallyTaggedTupleEnum"]
+        )
+    }
+}
+
+extension ExternallyTaggedTupleEnum: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: ExternallyTaggedTupleEnum.CodingKeys.self)
+        switch self {
+            case .one(let data):
+                return try container.encode(data, forKey: .one)
+            case .two(let data):
+                return try container.encode(data, forKey: .two)
+        }
+    }
+}
+
+
+
