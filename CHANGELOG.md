@@ -11,6 +11,10 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+### New Features
+
+- Incomplete support for generating types & codable instances for swift.
+
 ## v0.5.0 - 2021-11-02
 
 ### Breaking Changes
