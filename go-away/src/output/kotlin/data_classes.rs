@@ -1,8 +1,6 @@
-use std::default;
-
 use crate::output::prelude::*;
 
-use super::to_camel_case;
+use super::{kserializer::KSerializer, to_camel_case};
 
 pub struct DataClass<'a> {
     name: &'a str,
@@ -34,11 +32,6 @@ impl<'a> DataClass<'a> {
 
     pub fn with_fields(mut self, new_fields: impl IntoIterator<Item = Field<'a>>) -> Self {
         self.add_fields(new_fields);
-        self
-    }
-
-    pub fn with_inheritance(mut self, superclass: &'a str) -> Self {
-        self.inherits.push(superclass);
         self
     }
 
@@ -117,28 +110,18 @@ impl fmt::Display for NewTypeClass<'_> {
             inner_serializer,
             dataclass,
         } = self;
-        let serializer_name = serializer_name(name);
 
         writeln!(f, "{dataclass}")?;
 
-        writedoc!(
-            f,
-            r#"
-                object {serializer_name} : KSerializer<{name}> {{
-                    private val serializer = {inner_serializer};
+        let serializer = KSerializer::new(name)
+            .with_additional_members(format!("private val serializer = {inner_serializer}"))
+            .with_serialize_body("encoder.encodeSerializableValue(serializer, value.value)")
+            .with_deserialize_body(format!(
+                "return {name}(decoder.decodeSerializableValue(serializer))"
+            ))
+            .with_descriptor("serializer.descriptor");
 
-                    override val descriptor: SerialDescriptor = serializer.descriptor;
-
-                    override fun serialize(encoder: Encoder, value: {name}) {{
-                        encoder.encodeSerializableValue(serializer, value.value)
-                    }}
-
-                    override fun deserialize(decoder: Decoder): {name} {{
-                        return {name}(decoder.decodeSerializableValue(serializer))
-                    }}
-                }}
-            "#
-        )
+        writeln!(f, "{serializer}")
     }
 }
 

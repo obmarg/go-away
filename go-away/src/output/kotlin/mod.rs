@@ -1,6 +1,6 @@
 use crate::{
     output::prelude::*,
-    types::{self, Alias, Field, NewType, Struct},
+    types::{self, Alias, NewType, Struct},
 };
 
 use self::{enums::Enum, structs::KotlinStruct, unions::Union};
@@ -9,6 +9,7 @@ use super::go::FieldType;
 
 mod data_classes;
 mod enums;
+mod kserializer;
 mod structs;
 mod unions;
 

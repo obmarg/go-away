@@ -14,6 +14,7 @@ all APIs might be changed.
 ### New Features
 
 - Incomplete support for generating types & codable instances for swift.
+- Incomplete support for generating types & serializers for kotlin.
 
 ## v0.5.0 - 2021-11-02
 

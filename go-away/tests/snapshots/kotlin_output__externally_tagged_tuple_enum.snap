@@ -26,10 +26,8 @@ sealed interface ExternallyTaggedTupleEnum {
 
 
     object oneSerializer : KSerializer<one> {
-        private val serializer = One.serializer();
-
-        override val descriptor: SerialDescriptor = serializer.descriptor;
-
+        private val serializer = One.serializer()
+        override val descriptor: SerialDescriptor = serializer.descriptor
         override fun serialize(encoder: Encoder, value: one) {
             encoder.encodeSerializableValue(serializer, value.value)
         }
@@ -39,6 +37,7 @@ sealed interface ExternallyTaggedTupleEnum {
         }
     }
 
+
     @Serializable(with = twoSerializer::class)
     data class two(
         @SerialName("value")
@@ -47,10 +46,8 @@ sealed interface ExternallyTaggedTupleEnum {
 
 
     object twoSerializer : KSerializer<two> {
-        private val serializer = Two.serializer();
-
-        override val descriptor: SerialDescriptor = serializer.descriptor;
-
+        private val serializer = Two.serializer()
+        override val descriptor: SerialDescriptor = serializer.descriptor
         override fun serialize(encoder: Encoder, value: two) {
             encoder.encodeSerializableValue(serializer, value.value)
         }
@@ -60,6 +57,7 @@ sealed interface ExternallyTaggedTupleEnum {
         }
     }
 
+
 }
 object ExternallyTaggedTupleEnumSerializer : KSerializer<ExternallyTaggedTupleEnum> {
 
@@ -68,15 +66,17 @@ object ExternallyTaggedTupleEnumSerializer : KSerializer<ExternallyTaggedTupleEn
         element<ExternallyTaggedTupleEnum.two>("Two", isOptional = true)
     };
 
+
     override fun serialize(encoder: Encoder, value: ExternallyTaggedTupleEnum) {
         val composite = encoder.beginStructure(descriptor)
         when(value) {
             is ExternallyTaggedTupleEnum.one ->
-              composite.encodeSerializableElement(descriptor, 0, ExternallyTaggedTupleEnum.one.serializer(), value as ExternallyTaggedTupleEnum.one)
+                composite.encodeSerializableElement(descriptor, 0, ExternallyTaggedTupleEnum.one.serializer(), value as ExternallyTaggedTupleEnum.one)
             is ExternallyTaggedTupleEnum.two ->
-              composite.encodeSerializableElement(descriptor, 1, ExternallyTaggedTupleEnum.two.serializer(), value as ExternallyTaggedTupleEnum.two)
+                composite.encodeSerializableElement(descriptor, 1, ExternallyTaggedTupleEnum.two.serializer(), value as ExternallyTaggedTupleEnum.two)
         }
         composite.endStructure(descriptor)
+
     }
 
     override fun deserialize(decoder: Decoder): ExternallyTaggedTupleEnum {
@@ -88,7 +88,9 @@ object ExternallyTaggedTupleEnumSerializer : KSerializer<ExternallyTaggedTupleEn
         }
         composite.endStructure(descriptor)
         return rv
+
     }
 }
+
 
 

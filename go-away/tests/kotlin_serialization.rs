@@ -74,6 +74,8 @@ fn test_externally_tagged_tuple_enum() {
     );
 }
 
+/* TODO:
+
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", content = "data")]
 enum AdjacentlyTaggedTupleEnum {
@@ -93,14 +95,13 @@ fn test_adjacently_tagged_tuple_enum() {
     );
 }
 
+
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", content = "data")]
 enum StructEnum {
     OptionOne { x: String, y: i32 },
     OptionTwo { foo: String, bar: Nested },
 }
-
-/*
 
 TODO:
 
@@ -154,6 +155,7 @@ fn test_struct() {
     );
 }
 
+/* TODO:
 #[test]
 fn test_struct_enum() {
     run_test(
@@ -183,7 +185,7 @@ fn test_struct_enum() {
         ],
     );
 }
-
+ */
 fn run_test<T>(test_name: &str, type_name: &str, test_data: &[T])
 where
     T: TypeMetadata + Serialize + serde::de::DeserializeOwned + PartialEq + Debug,
