@@ -1,0 +1,65 @@
+---
+source: go-away/tests/kotlin_output.rs
+expression: "go_away::registry_to_output::<go_away::KotlinType>(&registry)"
+---
+@Serializable
+data class Two(
+    @SerialName("y")
+    public var y: Boolean,
+)
+
+
+@Serializable
+data class One(
+    @SerialName("x")
+    public var x: Double,
+)
+
+
+@Serializable(with = AdjacentlyTaggedTupleEnumsSerializer::class)
+sealed interface AdjacentlyTaggedTupleEnums {
+    @Serializable(with = optionOneSerializer::class)
+    data class optionOne: AdjacentlyTaggedTupleEnums(
+        @SerialName("value")
+        public var value: One,
+    )
+
+
+    object optionOneSerializer : KSerializer<optionOne> {
+        private val serializer = One.serializer();
+
+        override val descriptor: SerialDescriptor = serializer.descriptor;
+
+        override fun serialize(encoder: Encoder, value: optionOne) {
+            encoder.serialize(serializer, value.value)
+        }
+
+        override fun deserialize(decoder: Decoder): optionOne {
+            return optionOne(decoder.decode(serializer))
+        }
+    }
+
+    @Serializable(with = optionTwoSerializer::class)
+    data class optionTwo: AdjacentlyTaggedTupleEnums(
+        @SerialName("value")
+        public var value: Two,
+    )
+
+
+    object optionTwoSerializer : KSerializer<optionTwo> {
+        private val serializer = Two.serializer();
+
+        override val descriptor: SerialDescriptor = serializer.descriptor;
+
+        override fun serialize(encoder: Encoder, value: optionTwo) {
+            encoder.serialize(serializer, value.value)
+        }
+
+        override fun deserialize(decoder: Decoder): optionTwo {
+            return optionTwo(decoder.decode(serializer))
+        }
+    }
+
+}
+
+

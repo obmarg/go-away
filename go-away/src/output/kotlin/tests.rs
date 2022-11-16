@@ -64,33 +64,26 @@ fn test_newtype_output() {
             inner: FieldType::Primitive(Primitive::String),
         })
         .to_string(), @r###"
-    public struct UserId: Hashable {
-        public var value: String
+    @Serializable(with = UserIdSerializer::class)
+    data class UserId(
+        @SerialName("value")
+        public var value: String,
+    )
 
-        public init(
-            value: String) {
-            self.value = value
+
+    object UserIdSerializer : KSerializer<UserId> {
+        private val serializer = String.serializer();
+
+        override val descriptor: SerialDescriptor = serializer.descriptor;
+
+        override fun serialize(encoder: Encoder, value: UserId) {
+            encoder.encodeSerializableValue(serializer, value.value)
+        }
+
+        override fun deserialize(decoder: Decoder): UserId {
+            return UserId(decoder.decodeSerializableValue(serializer))
         }
     }
-
-
-    extension UserId: Decodable {
-        public init(from decoder: Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            let value = try decoder.decode(String.self)
-            UserId(value)
-
-        }
-    }
-
-    extension UserId: Encodable {
-        public func encode(to encoder: Encoder) throws {
-            var container = try encoder.singleValueContainer()
-            try container.encode(self.value)
-
-        }
-    }
-
 
     "###);
 }
@@ -153,7 +146,7 @@ fn test_adjacently_tagged_union_output() {
 fn test_list_types() {
     assert_snapshot!(
         FieldType::List(Box::new(FieldType::Primitive(Primitive::String))).kotlin_type(),
-        @"[String]"
+        @"List<String>"
     );
 }
 
@@ -164,7 +157,7 @@ fn test_map_types() {
             key: Box::new(FieldType::Primitive(Primitive::String)),
             value: Box::new(FieldType::Primitive(Primitive::Int))
         }.kotlin_type(),
-        @"[String: Int64]"
+        @"Map<String, Long>"
     );
 }
 

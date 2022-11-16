@@ -12,6 +12,10 @@ use serde::{Deserialize, Serialize};
 
 use go_away::{registry_to_output, TypeMetadata, TypeRegistry};
 
+mod utils;
+
+use utils::numbered;
+
 /* TODO
 #[cfg(feature = "chrono")]
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -203,10 +207,8 @@ where
 
     if !compile_status.success() {
         println!("Error when compiling {test_name}");
-        println!(
-            "Contents of swift file: {}",
-            std::fs::read_to_string(file_path).unwrap()
-        );
+        println!("Contents of swift file");
+        println!("{}", numbered(std::fs::read_to_string(file_path).unwrap()));
         panic!("compilation failed");
     }
 

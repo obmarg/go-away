@@ -1,5 +1,7 @@
 #![allow(clippy::unit_arg, clippy::disallowed_names)]
 
+mod utils;
+
 use std::{
     fmt::Debug,
     fs::File,
@@ -11,6 +13,8 @@ use indoc::writedoc;
 use serde::{Deserialize, Serialize};
 
 use go_away::{registry_to_output, TypeMetadata, TypeRegistry};
+
+use utils::numbered;
 
 /* TODO
 #[cfg(feature = "chrono")]
@@ -200,10 +204,16 @@ where
         package go.away.test
 
         import kotlinx.serialization.Serializable
+        import kotlinx.serialization.KSerializer
         import kotlinx.serialization.SerialName
         import kotlinx.serialization.decodeFromString
         import kotlinx.serialization.encodeToString
         import kotlinx.serialization.json.Json
+        import kotlinx.serialization.descriptors.SerialDescriptor
+        import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+        import kotlinx.serialization.descriptors.element
+        import kotlinx.serialization.encoding.Encoder
+        import kotlinx.serialization.encoding.Decoder
 
         {kotlin_code}
 
@@ -227,10 +237,8 @@ where
 
     if !compile_status.success() {
         println!("Error when compiling {test_name}");
-        println!(
-            "Contents of kotlin file: {}",
-            std::fs::read_to_string(file_path).unwrap()
-        );
+        println!("Contents of kotlin file: ");
+        println!("{}", numbered(std::fs::read_to_string(file_path).unwrap()));
         panic!("compilation failed");
     }
 

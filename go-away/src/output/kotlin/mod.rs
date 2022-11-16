@@ -7,6 +7,7 @@ use self::{enums::Enum, structs::KotlinStruct, unions::Union};
 
 use super::go::FieldType;
 
+mod data_classes;
 mod enums;
 mod structs;
 mod unions;
@@ -64,20 +65,6 @@ impl<'a> fmt::Display for KotlinType<'a> {
     }
 }
 
-pub struct KotlinField<'a>(&'a Field);
-
-impl<'a> fmt::Display for KotlinField<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        let details = self.0;
-        write!(
-            f,
-            r#"public var {}: {}"#,
-            to_camel_case(&details.name),
-            details.ty.kotlin_type(),
-        )
-    }
-}
-
 impl FieldType {
     fn kotlin_type(&self) -> String {
         use crate::types::Primitive;
@@ -104,6 +91,27 @@ impl FieldType {
         match self {
             FieldType::Optional(_) => " = null",
             _ => "",
+        }
+    }
+
+    fn serializer(&self) -> String {
+        match self {
+            FieldType::Optional(inner) => {
+                format!("{}.nullable", inner.serializer())
+            }
+            FieldType::List(inner) => {
+                format!("ListSerializer({})", inner.serializer())
+            }
+            FieldType::Map { key, value } => {
+                format!(
+                    "MapSerializer({}, {})",
+                    key.serializer(),
+                    value.serializer()
+                )
+            }
+            FieldType::Named(_) | FieldType::Primitive(_) => {
+                format!("{}.serializer()", self.kotlin_type())
+            }
         }
     }
 }

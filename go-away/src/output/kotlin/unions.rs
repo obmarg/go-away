@@ -3,7 +3,10 @@ use crate::{
     types::{self, UnionRepresentation},
 };
 
-use super::to_camel_case;
+use super::{
+    data_classes::{DataClass, NewTypeClass},
+    to_camel_case,
+};
 
 pub struct Union<'a> {
     name: &'a str,
@@ -29,17 +32,28 @@ impl<'a> Union<'a> {
 struct Variant<'a> {
     name: String,
     ty: String,
+    inner_serializer: String,
     serde_name: &'a str,
+}
+
+impl<'a> Variant<'a> {
+    fn newtype(&'a self, enum_class: &'a str) -> NewTypeClass<'a> {
+        NewTypeClass::new(&self.name, self.ty.clone(), self.inner_serializer.clone())
+            .with_inheritance(enum_class)
+    }
 }
 
 impl<'a> From<&'a types::UnionVariant> for Variant<'a> {
     fn from(val: &'a types::UnionVariant) -> Self {
         Variant {
+            // TODO: This should not be camel cased, but removing that change causes
+            // null pointer exceptions :sob:
             name: to_camel_case(
                 val.name
                     .as_ref()
                     .expect("union variants to generally have names"),
             ),
+            inner_serializer: val.ty.serializer(),
             ty: val.ty.kotlin_type(),
             serde_name: &val.serialized_name,
         }
@@ -49,12 +63,74 @@ impl<'a> From<&'a types::UnionVariant> for Variant<'a> {
 impl fmt::Display for Union<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let name = &self.name;
-        writeln!(f, "public enum {name} {{")?;
+        let serializer_name = format!("{name}Serializer");
+        writeln!(f, "@Serializable(with = {serializer_name}::class)")?;
+        writeln!(f, "sealed interface {name} {{")?;
         writeln_for!(
             indented(f),
-            Variant{ name, ty, .. } in &self.variants,
-            "case {name}({ty})"
+            newtype in self.variants.iter().map(|v| v.newtype(name)),
+            "{newtype}"
         );
+        writeln!(f, "}}")?;
+
+        match &self.representation {
+            UnionRepresentation::AdjacentlyTagged { tag, content } => todo!(),
+            UnionRepresentation::InternallyTagged { tag } => todo!(),
+            UnionRepresentation::ExternallyTagged => {
+                writeln!(f, "object {serializer_name} : KSerializer<{name}> {{\n")?;
+                let f2 = &mut indented(f);
+                writeln!(
+                    f2,
+                    r#"override val descriptor: SerialDescriptor = buildClassSerialDescriptor("{name}") {{"#
+                )?;
+                writeln_for!(
+                    indented(f2),
+                    Variant { name: variant_name, serde_name, .. } in &self.variants,
+                    r#"element<{name}.{variant_name}>("{serde_name}", isOptional = true)"#
+                );
+                writeln!(f2, "}};\n")?;
+                let f2 = &mut indented(f);
+                writeln!(
+                    f2,
+                    "override fun serialize(encoder: Encoder, value: {name}) {{",
+                )?;
+                let f3 = &mut indented(f2);
+                writeln!(f3, "val composite = encoder.beginStructure(descriptor)")?;
+                writeln!(f3, "when(value) {{")?;
+                writedoc_for!(
+                    indented(f3),
+                    (i, Variant { name: variant_name, .. }) in self.variants.iter().enumerate(),
+                    r#"
+                        is {name}.{variant_name} ->
+                          composite.encodeSerializableElement(descriptor, {i}, {name}.{variant_name}.serializer(), value as {name}.{variant_name})
+                    "#
+                );
+                writeln!(f3, "}}")?;
+                writeln!(f3, "composite.endStructure(descriptor)")?;
+                writeln!(f2, "}}\n")?;
+                writeln!(f2, "override fun deserialize(decoder: Decoder): {name} {{")?;
+                let f3 = &mut indented(f2);
+                writeln!(f3, "val composite = decoder.beginStructure(descriptor)")?;
+                writeln!(
+                    f3,
+                    "val rv = when (val index = composite.decodeElementIndex(descriptor)) {{"
+                )?;
+                writedoc_for!(
+                    indented(f3),
+                    (i, Variant { name: variant_name, .. }) in self.variants.iter().enumerate(),
+                    r#"
+                        {i} -> composite.decodeSerializableElement(descriptor, {i}, {name}.{variant_name}.serializer())
+                    "#
+                );
+                writeln!(indented(f3), r#"else -> error("Unexpected input")"#)?;
+                writeln!(f3, "}}")?;
+                writeln!(f3, "composite.endStructure(descriptor)")?;
+                writeln!(f3, "return rv")?;
+                writeln!(f2, "}}")?;
+                writeln!(f, "}}")?;
+            }
+            UnionRepresentation::Untagged => todo!(),
+        }
 
         // Note: We won't need a Codable impl _if_ we've got an externally tagged union that
         // has named struct fields inside it (which isn't even possible rn, :sigh:)
@@ -105,7 +181,6 @@ impl fmt::Display for Union<'_> {
                }
                writeln!(f, "{codable}")?;
         */
-        todo!("Rest of this");
         Ok(())
     }
 }
