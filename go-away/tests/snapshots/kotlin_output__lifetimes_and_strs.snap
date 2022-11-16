@@ -1,0 +1,14 @@
+---
+source: go-away/tests/kotlin_output.rs
+expression: "go_away::registry_to_output::<go_away::KotlinType>(&registry)"
+---
+@Serializable
+data class TypeWithLifetimes(
+    @SerialName("data")
+    public var data: String,
+    @SerialName("other")
+    public var other: String,
+)
+
+
+

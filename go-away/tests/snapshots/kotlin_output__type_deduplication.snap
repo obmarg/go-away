@@ -1,0 +1,32 @@
+---
+source: go-away/tests/kotlin_output.rs
+expression: "go_away::registry_to_output::<go_away::KotlinType>(&registry)"
+---
+@Serializable
+data class MyData(
+    @SerialName("field_one")
+    public var fieldOne: String,
+    @SerialName("nested")
+    public var nested: Nested,
+)
+
+
+@Serializable
+data class Nested(
+    @SerialName("some_other_name")
+    public var aString: String,
+    @SerialName("an_int")
+    public var anInt: Long,
+    @SerialName("fulfilment_type")
+    public var fulfilmentType: FulfilmentType,
+)
+
+
+@Serializable
+public enum class FulfilmentType {
+    @SerialName("Delivery") DELIVERY,
+    @SerialName("Collection") COLLECTION,
+}
+
+
+
