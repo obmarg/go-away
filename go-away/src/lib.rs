@@ -44,7 +44,7 @@ pub mod types;
 
 pub use alias::TypeAlias;
 pub use metadata::TypeMetadata;
-pub use output::{GoType, SwiftType, TypeScriptType};
+pub use output::{GoType, KotlinType, SwiftType, TypeScriptType};
 pub use registry::TypeRegistry;
 pub use type_id::TypeId;
 
@@ -122,6 +122,18 @@ impl<'a> From<&'a registry::Type> for output::swift::SwiftType<'a> {
             registry::Type::Union(inner) => SwiftType::Union(inner),
             registry::Type::NewType(inner) => SwiftType::NewType(inner),
             registry::Type::Alias(inner) => SwiftType::Alias(inner),
+        }
+    }
+}
+
+impl<'a> From<&'a registry::Type> for KotlinType<'a> {
+    fn from(ty: &'a registry::Type) -> Self {
+        match ty {
+            registry::Type::Struct(inner) => KotlinType::Struct(inner),
+            registry::Type::Enum(inner) => KotlinType::Enum(inner),
+            registry::Type::Union(inner) => KotlinType::Union(inner),
+            registry::Type::NewType(inner) => KotlinType::NewType(inner),
+            registry::Type::Alias(inner) => KotlinType::Alias(inner),
         }
     }
 }

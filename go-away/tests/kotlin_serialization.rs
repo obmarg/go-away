@@ -1,5 +1,7 @@
 #![allow(clippy::unit_arg, clippy::disallowed_names)]
 
+mod utils;
+
 use std::{
     fmt::Debug,
     fs::File,
@@ -11,8 +13,6 @@ use indoc::writedoc;
 use serde::{Deserialize, Serialize};
 
 use go_away::{registry_to_output, TypeMetadata, TypeRegistry};
-
-mod utils;
 
 use utils::numbered;
 
@@ -74,6 +74,8 @@ fn test_externally_tagged_tuple_enum() {
     );
 }
 
+/* TODO:
+
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", content = "data")]
 enum AdjacentlyTaggedTupleEnum {
@@ -93,14 +95,13 @@ fn test_adjacently_tagged_tuple_enum() {
     );
 }
 
+
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", content = "data")]
 enum StructEnum {
     OptionOne { x: String, y: i32 },
     OptionTwo { foo: String, bar: Nested },
 }
-
-/*
 
 TODO:
 
@@ -140,6 +141,21 @@ fn test_datetime() {
 }
 */
 
+// TODO: Can ditch this one once we've got the rest working
+#[test]
+fn test_struct() {
+    run_test(
+        "struct",
+        "Nested",
+        &[Nested {
+            a_string: "hello".into(),
+            an_int: 65536,
+            fulfilment_type: FulfilmentType::Collection,
+        }],
+    );
+}
+
+/* TODO:
 #[test]
 fn test_struct_enum() {
     run_test(
@@ -169,51 +185,78 @@ fn test_struct_enum() {
         ],
     );
 }
-
+ */
 fn run_test<T>(test_name: &str, type_name: &str, test_data: &[T])
 where
     T: TypeMetadata + Serialize + serde::de::DeserializeOwned + PartialEq + Debug,
 {
     let mut registry = TypeRegistry::new();
     T::metadata(&mut registry);
-    let swift_code = registry_to_output::<go_away::SwiftType>(&registry);
+    let kotlin_code = registry_to_output::<go_away::KotlinType>(&registry);
+
     let path = tempfile::tempdir().unwrap();
-    let file_path = path.path().join("main.swift");
+    fs_extra::dir::copy("tests/gradle-template", &path, &Default::default()).unwrap();
+    let path = path.path().join("gradle-template");
+    let file_path = path.join("app/src/main/kotlin/go/away/test/App.kt");
     let mut file = File::create(&file_path).unwrap();
 
     writedoc!(
         &mut file,
         r#"
-            import Foundation
+        package go.away.test
 
-            {swift_code}
+        import kotlinx.serialization.Serializable
+        import kotlinx.serialization.KSerializer
+        import kotlinx.serialization.SerialName
+        import kotlinx.serialization.decodeFromString
+        import kotlinx.serialization.encodeToString
+        import kotlinx.serialization.json.Json
+        import kotlinx.serialization.descriptors.SerialDescriptor
+        import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+        import kotlinx.serialization.descriptors.element
+        import kotlinx.serialization.encoding.Encoder
+        import kotlinx.serialization.encoding.Decoder
 
-            while let line = readLine() {{
-                let line = line.trimmingCharacters(in: .whitespacesAndNewlines)
-                let data = line.data(using: .utf8)!
-                let input = try! JSONDecoder().decode({type_name}.self, from: data)
-                let output = String(decoding: try! JSONEncoder().encode(input), as: UTF8.self)
-                print(output)
+        {kotlin_code}
+
+        fun main() {{
+            var line = readLine()
+            while (line != null) {{
+                val output = Json.encodeToString(Json.decodeFromString<{type_name}>(line))
+                println(output)
+                line = readLine()
             }}
+        }}
 		"#,
     )
     .unwrap();
 
-    let compile_status = Command::new("swiftc")
-        .args(["main.swift"])
+    let compile_status = Command::new("./gradlew")
+        .args(["build"])
         .current_dir(&path)
         .status()
         .unwrap();
 
     if !compile_status.success() {
         println!("Error when compiling {test_name}");
-        println!("Contents of swift file");
+        println!("Contents of kotlin file: ");
         println!("{}", numbered(std::fs::read_to_string(file_path).unwrap()));
         panic!("compilation failed");
     }
 
-    let process = Command::new("./main")
-        .current_dir(&path)
+    let dist_path = path.join("app/build/distributions/");
+    let unzip_status = Command::new("unzip")
+        .args(["app.zip"])
+        .current_dir(&dist_path)
+        .status()
+        .unwrap();
+    if !unzip_status.success() {
+        panic!("Couldn't unzip distribution");
+    }
+
+    let script_path = dist_path.join("app/bin");
+    let process = Command::new("./app")
+        .current_dir(script_path)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

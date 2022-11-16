@@ -1,0 +1,51 @@
+---
+source: go-away/src/output/kotlin/tests.rs
+expression: "KotlinType::Union(&types::Union {\n                name: \"MyUnion\".into(),\n                representation: UnionRepresentation::AdjacentlyTagged {\n                    tag: \"type\".into(),\n                    content: \"data\".into(),\n                },\n                variants: vec![UnionVariant\n                    {\n                        name : Some(\"VarOne\".into()), ty : FieldType ::\n                        Named(TypeRef { name : \"VarOne\".into() }), serialized_name :\n                        \"VAR_ONE\".into(),\n                    }, UnionVariant\n                    {\n                        name : Some(\"VarTwo\".into()), ty : FieldType ::\n                        Named(TypeRef { name : \"VarTwo\".into() }), serialized_name :\n                        \"VAR_TWO\".into(),\n                    }],\n            }).to_string()"
+---
+@Serializable(with = MyUnionSerializer::class)
+sealed interface MyUnion {
+    @Serializable(with = varOneSerializer::class)
+    data class varOne: MyUnion(
+        @SerialName("value")
+        public var value: VarOne,
+    )
+
+
+    object varOneSerializer : KSerializer<varOne> {
+        private val serializer = VarOne.serializer();
+
+        override val descriptor: SerialDescriptor = serializer.descriptor;
+
+        override fun serialize(encoder: Encoder, value: varOne) {
+            encoder.serialize(serializer, value.value)
+        }
+
+        override fun deserialize(decoder: Decoder): varOne {
+            return varOne(decoder.decode(serializer))
+        }
+    }
+
+    @Serializable(with = varTwoSerializer::class)
+    data class varTwo: MyUnion(
+        @SerialName("value")
+        public var value: VarTwo,
+    )
+
+
+    object varTwoSerializer : KSerializer<varTwo> {
+        private val serializer = VarTwo.serializer();
+
+        override val descriptor: SerialDescriptor = serializer.descriptor;
+
+        override fun serialize(encoder: Encoder, value: varTwo) {
+            encoder.serialize(serializer, value.value)
+        }
+
+        override fun deserialize(decoder: Decoder): varTwo {
+            return varTwo(decoder.decode(serializer))
+        }
+    }
+
+}
+
+

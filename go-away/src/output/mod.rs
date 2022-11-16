@@ -1,8 +1,10 @@
 pub mod go;
+pub mod kotlin;
 pub mod swift;
 pub mod typescript;
 
 pub use go::GoType;
+pub use kotlin::KotlinType;
 pub use swift::SwiftType;
 pub use typescript::TypeScriptType;
 

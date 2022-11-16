@@ -1,0 +1,96 @@
+---
+source: go-away/tests/kotlin_output.rs
+expression: "go_away::registry_to_output::<go_away::KotlinType>(&registry)"
+---
+@Serializable
+data class Two(
+    @SerialName("y")
+    public var y: Boolean,
+)
+
+
+@Serializable
+data class One(
+    @SerialName("x")
+    public var x: Double,
+)
+
+
+@Serializable(with = ExternallyTaggedTupleEnumSerializer::class)
+sealed interface ExternallyTaggedTupleEnum {
+    @Serializable(with = oneSerializer::class)
+    data class one(
+        @SerialName("value")
+        public var value: One,
+    ): ExternallyTaggedTupleEnum
+
+
+    object oneSerializer : KSerializer<one> {
+        private val serializer = One.serializer()
+        override val descriptor: SerialDescriptor = serializer.descriptor
+        override fun serialize(encoder: Encoder, value: one) {
+            encoder.encodeSerializableValue(serializer, value.value)
+        }
+
+        override fun deserialize(decoder: Decoder): one {
+            return one(decoder.decodeSerializableValue(serializer))
+        }
+    }
+
+
+    @Serializable(with = twoSerializer::class)
+    data class two(
+        @SerialName("value")
+        public var value: Two,
+    ): ExternallyTaggedTupleEnum
+
+
+    object twoSerializer : KSerializer<two> {
+        private val serializer = Two.serializer()
+        override val descriptor: SerialDescriptor = serializer.descriptor
+        override fun serialize(encoder: Encoder, value: two) {
+            encoder.encodeSerializableValue(serializer, value.value)
+        }
+
+        override fun deserialize(decoder: Decoder): two {
+            return two(decoder.decodeSerializableValue(serializer))
+        }
+    }
+
+
+}
+object ExternallyTaggedTupleEnumSerializer : KSerializer<ExternallyTaggedTupleEnum> {
+
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ExternallyTaggedTupleEnum") {
+        element<ExternallyTaggedTupleEnum.one>("One", isOptional = true)
+        element<ExternallyTaggedTupleEnum.two>("Two", isOptional = true)
+    };
+
+
+    override fun serialize(encoder: Encoder, value: ExternallyTaggedTupleEnum) {
+        val composite = encoder.beginStructure(descriptor)
+        when(value) {
+            is ExternallyTaggedTupleEnum.one ->
+                composite.encodeSerializableElement(descriptor, 0, ExternallyTaggedTupleEnum.one.serializer(), value as ExternallyTaggedTupleEnum.one)
+            is ExternallyTaggedTupleEnum.two ->
+                composite.encodeSerializableElement(descriptor, 1, ExternallyTaggedTupleEnum.two.serializer(), value as ExternallyTaggedTupleEnum.two)
+        }
+        composite.endStructure(descriptor)
+
+    }
+
+    override fun deserialize(decoder: Decoder): ExternallyTaggedTupleEnum {
+        val composite = decoder.beginStructure(descriptor)
+        val rv = when (val index = composite.decodeElementIndex(descriptor)) {
+            0 -> composite.decodeSerializableElement(descriptor, 0, ExternallyTaggedTupleEnum.one.serializer())
+            1 -> composite.decodeSerializableElement(descriptor, 1, ExternallyTaggedTupleEnum.two.serializer())
+            else -> error("Unexpected input")
+        }
+        composite.endStructure(descriptor)
+        return rv
+
+    }
+}
+
+
+
