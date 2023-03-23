@@ -8,6 +8,8 @@ use go_away::{TypeAlias, TypeMetadata, TypeRegistry};
 struct MyData {
     field_one: String,
     nested: Nested,
+    #[serde(skip)]
+    a_field_to_skip: Option<bool>,
 }
 
 #[test]
@@ -23,6 +25,8 @@ fn test_struct_output() {
 enum NewTypeEnum {
     OptionOne(One),
     OptionTwo(Two),
+    #[serde(skip)]
+    Skippable(bool),
 }
 
 #[derive(TypeMetadata)]
@@ -60,8 +64,18 @@ fn test_newtype_enum() {
 #[derive(TypeMetadata)]
 #[serde(tag = "type", content = "data")]
 enum StructEnum {
-    OptionOne { x: String, y: i32 },
-    OptionTwo { foo: String, bar: Nested },
+    OptionOne {
+        x: String,
+        y: i32,
+    },
+    OptionTwo {
+        foo: String,
+        bar: Nested,
+    },
+    #[serde(skip)]
+    Skippable {
+        foo: String,
+    },
 }
 
 #[test]

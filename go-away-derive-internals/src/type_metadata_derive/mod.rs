@@ -43,6 +43,9 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
                 };
             });
             for variant in variants {
+                if variant.attrs.skip_deserializing() && variant.attrs.skip_serializing() {
+                    continue;
+                }
                 let variant_name = Literal::string(&variant.ident.to_string());
                 let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
                 inner.append_all(quote! {
@@ -67,6 +70,9 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
                 };
             });
             for variant in variants {
+                if variant.attrs.skip_deserializing() && variant.attrs.skip_serializing() {
+                    continue;
+                }
                 let variant_name = Literal::string(&variant.ident.to_string());
                 let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
                 let metadata_call = metadata_call(variant.fields.first().unwrap().ty);
@@ -94,6 +100,9 @@ pub fn type_metadata_derive(ast: &syn::DeriveInput) -> Result<TokenStream, syn::
                 };
             });
             for variant in variants {
+                if variant.attrs.skip_deserializing() && variant.attrs.skip_serializing() {
+                    continue;
+                }
                 let variant_name = Literal::string(&variant.ident.to_string());
                 let serialized_name = Literal::string(&variant.attrs.name().serialize_name());
                 let type_id =
@@ -160,6 +169,9 @@ fn struct_block(name: &str, fields: &[Field], type_id: TypeIdCall<'_>) -> TokenS
         };
     });
     for field in fields {
+        if field.attrs.skip_deserializing() && field.attrs.skip_serializing() {
+            continue;
+        }
         let field_name = name_of_member(&field.member);
         let serialized_name = Literal::string(&field.attrs.name().serialize_name());
         let ty_def = metadata_call(field.ty);
