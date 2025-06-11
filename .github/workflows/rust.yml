@@ -1,10 +1,10 @@
-name: Rust
+name: rust
 
 on:
   push:
-    branches: [ master, staging, trying ]
+    branches: [master, staging, trying]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 env:
   CARGO_INCREMENTAL: 0
@@ -15,42 +15,39 @@ env:
 
 jobs:
   check-format:
+    # Skip draft release PRs
+    # if: github.actor_id != '166155226' || github.event_name != 'pull_request' || github.event.pull_request.draft == false
+
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-    - name: Check formatting
-      uses: actions-rs/cargo@v1
-      with:
-        command: fmt
-        args: -- --check
-      
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@1.78.0
+        with:
+          components: rustfmt
+      - name: Check format
+        run: cargo fmt --all --check
+
   build:
+    # Skip draft release PRs
+    # if: github.actor_id != '166155226' || github.event_name != 'pull_request' || github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-    - uses: Swatinem/rust-cache@v1
-    - name: Build
-      uses: actions-rs/cargo@v1
-      with:
-        command: build
-        args: --all-features
-    - name: Build tests
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --all-features --no-run
-    - name: Run tests
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --all-features
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@1.78.0
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --workspace --all-features
+      - name: Build tests
+        run: cargo test --workspace --all-features --no-run
+      - name: Run tests
+        run: cargo test --workspace --all-features
+      - name: Run clippy
+        run: cargo clippy --all --all-features
