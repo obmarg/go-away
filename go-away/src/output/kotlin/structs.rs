@@ -10,7 +10,7 @@ pub enum KotlinStruct<'a> {
 }
 
 impl<'a> KotlinStruct<'a> {
-    pub fn new(name: &'a str) -> KotlinStruct {
+    pub fn new(name: &'a str) -> KotlinStruct<'a> {
         KotlinStruct::Normal(DataClass::new(name))
     }
 

@@ -13,7 +13,7 @@ pub struct SwiftStruct<'a> {
 }
 
 impl<'a> SwiftStruct<'a> {
-    pub fn new(name: &'a str) -> SwiftStruct {
+    pub fn new(name: &'a str) -> SwiftStruct<'a> {
         SwiftStruct {
             name,
             fields: Vec::new(),
