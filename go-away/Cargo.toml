@@ -10,7 +10,12 @@ documentation = "https://docs.rs/go-away"
 repository = "https://github.com/obmarg/go-away"
 readme = "../README.md"
 keywords = ["golang", "codegen", "generate", "types"]
-categories = ["development-tools", "development-tools::ffi", "encoding", "web-programming"]
+categories = [
+    "development-tools",
+    "development-tools::ffi",
+    "encoding",
+    "web-programming",
+]
 
 [features]
 default = []
@@ -22,8 +27,8 @@ indoc = "1.0"
 go-away-derive = { path = "../go-away-derive", version = "0.5.0" }
 
 # Integration Deps
-uuid = { version = "0.8", optional = true }
-chrono = { version = "0.4", optional = true , features = ["serde"] }
+uuid = { version = ">=1.0.0, <2.0.0", optional = true }
+chrono = { version = "0.4", optional = true, features = ["serde"] }
 
 [dev-dependencies]
 fs_extra = "1.2.0"
