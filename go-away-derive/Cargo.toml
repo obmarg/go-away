@@ -1,14 +1,15 @@
 [package]
 name = "go-away-derive"
-version = "0.5.0"
-authors = ["Graeme Coupar <graeme@polyandglot.dev>"]
-edition = "2018"
-license = "MPL-2.0"
 description = "Derives for go-away, which generates go types from rust types"
-homepage = "https://github.com/obmarg/go-away"
-documentation = "https://docs.rs/go-away"
-repository = "https://github.com/obmarg/go-away"
 readme = "../README.md"
+authors.workspace = true
+documentation.workspace = true
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
 
 [lib]
 proc-macro = true
