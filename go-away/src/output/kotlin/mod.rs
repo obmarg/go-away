@@ -33,7 +33,7 @@ pub enum KotlinType<'a> {
     Union(&'a types::Union),
 }
 
-impl<'a> fmt::Display for KotlinType<'a> {
+impl fmt::Display for KotlinType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             KotlinType::Struct(details) => {

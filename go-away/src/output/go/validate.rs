@@ -6,7 +6,7 @@ use super::{indented, Union};
 
 pub struct UnionValidate<'a>(pub &'a Union);
 
-impl<'a> fmt::Display for UnionValidate<'a> {
+impl fmt::Display for UnionValidate<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         writeln!(
             f,

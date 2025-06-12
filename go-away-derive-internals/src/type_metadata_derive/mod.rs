@@ -241,6 +241,7 @@ fn name_of_member(member: &syn::Member) -> proc_macro2::Literal {
 mod tests {
     use insta::assert_snapshot;
     use quote::quote;
+    use xshell::Shell;
 
     use super::*;
 
@@ -279,6 +280,7 @@ mod tests {
     }
 
     fn format_code(text: &str) -> String {
-        xshell::cmd!("rustfmt").stdin(text).read().unwrap()
+        let sh = Shell::new().unwrap();
+        xshell::cmd!(sh, "rustfmt").stdin(text).read().unwrap()
     }
 }

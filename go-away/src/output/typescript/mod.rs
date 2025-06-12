@@ -21,7 +21,7 @@ pub enum TypeScriptType<'a> {
     Union(&'a Union),
 }
 
-impl<'a> fmt::Display for TypeScriptType<'a> {
+impl fmt::Display for TypeScriptType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match self {
             TypeScriptType::Struct(details) => {
@@ -132,7 +132,7 @@ impl<'a> fmt::Display for TypeScriptType<'a> {
 
 pub struct TypeScriptField<'a>(&'a Field);
 
-impl<'a> fmt::Display for TypeScriptField<'a> {
+impl fmt::Display for TypeScriptField<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         let details = self.0;
         write!(

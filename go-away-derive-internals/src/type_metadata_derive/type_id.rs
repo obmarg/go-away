@@ -27,7 +27,7 @@ impl<'a> TypeIdCall<'a> {
     }
 }
 
-impl<'a> ToTokens for TypeIdCall<'a> {
+impl ToTokens for TypeIdCall<'_> {
     fn to_tokens(&self, stream: &mut proc_macro2::TokenStream) {
         match self {
             Self::Struct(s) => s.to_tokens(stream),
@@ -41,7 +41,7 @@ pub struct StructTypeIdCall<'a> {
     generics: StaticGenerics<'a>,
 }
 
-impl<'a> ToTokens for StructTypeIdCall<'a> {
+impl ToTokens for StructTypeIdCall<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let ident = self.ident;
         let generics = &self.generics;
@@ -58,7 +58,7 @@ pub struct VariantTypeIdCall<'a> {
     generics: StaticGenerics<'a>,
 }
 
-impl<'a> ToTokens for VariantTypeIdCall<'a> {
+impl ToTokens for VariantTypeIdCall<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let enum_ident = self.enum_ident;
         let variant_name = Literal::string(&self.variant_name.to_string());
@@ -76,7 +76,7 @@ impl<'a> ToTokens for VariantTypeIdCall<'a> {
 /// lifetimes
 struct StaticGenerics<'a>(&'a syn::Generics);
 
-impl<'a> quote::ToTokens for StaticGenerics<'a> {
+impl quote::ToTokens for StaticGenerics<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         use syn::{GenericParam, Token};
 
@@ -128,7 +128,7 @@ impl<'a> quote::ToTokens for StaticGenerics<'a> {
 
 pub struct TokensOrDefault<'a, T: 'a>(pub &'a Option<T>);
 
-impl<'a, T> quote::ToTokens for TokensOrDefault<'a, T>
+impl<T> quote::ToTokens for TokensOrDefault<'_, T>
 where
     T: quote::ToTokens + Default,
 {

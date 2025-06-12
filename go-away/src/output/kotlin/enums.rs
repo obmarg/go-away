@@ -11,7 +11,7 @@ pub struct Enum<'a> {
 }
 
 impl<'a> Enum<'a> {
-    pub fn new(name: &'a str) -> Enum {
+    pub fn new(name: &'a str) -> Enum<'a> {
         Enum {
             name,
             variants: Vec::new(),
