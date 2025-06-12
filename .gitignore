@@ -1,5 +1,4 @@
 /target
-/go-temp
 
 # Ignore Gradle project-specific cache directory
 .gradle
