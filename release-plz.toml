@@ -40,7 +40,7 @@ body = """
 """
 
 [[package]]
-name = "cynic"
+name = "go-away"
 
 git_tag_name = "v{{version}}"
 git_tag_enable = true
@@ -51,29 +51,7 @@ git_release_name = "v{{version}}"
 changelog_update = true
 changelog_path = "CHANGELOG.md"
 changelog_include = [
-    "cynic-cli",
-    "cynic-codegen",
-    "cynic-introspection",
-    "cynic-proc-macros",
-    "cynic-querygen",
-    "cynic-querygen-web",
+    "go-away",
+    "go-away-derive",
+    "go-away-derive-intervals",
 ]
-
-[[package]]
-name = "cynic-parser"
-version_group = "cynic-parser"
-git_tag_enable = true
-git_release_enable = true
-changelog_update = true
-
-[[package]]
-name = "cynic-parser-deser"
-version_group = "cynic-parser"
-changelog_update = true
-changelog_include = [
-    "cynic-parser-deser-macros"
-]
-
-[[package]]
-name = "cynic-parser-deser-macros"
-version_group = "cynic-parser"
