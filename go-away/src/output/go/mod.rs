@@ -27,7 +27,7 @@ pub enum GoType<'a> {
     Union(&'a Union),
 }
 
-impl<'a> fmt::Display for GoType<'a> {
+impl fmt::Display for GoType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         let f = &mut tabify::tabify(f);
         match self {
@@ -82,7 +82,7 @@ impl<'a> fmt::Display for GoType<'a> {
 
 pub struct GoField<'a>(&'a Field);
 
-impl<'a> fmt::Display for GoField<'a> {
+impl fmt::Display for GoField<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         let details = self.0;
         write!(
@@ -114,7 +114,7 @@ impl FieldType {
 struct UnionMarshal<'a>(&'a Union);
 struct UnionUnmarshal<'a>(&'a Union);
 
-impl<'a> fmt::Display for UnionMarshal<'a> {
+impl fmt::Display for UnionMarshal<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let details = self.0;
         writedoc!(
@@ -182,7 +182,7 @@ struct AdjacentlyTaggedMarshaller<'a> {
     variant: &'a UnionVariant,
 }
 
-impl<'a> fmt::Display for AdjacentlyTaggedMarshaller<'a> {
+impl fmt::Display for AdjacentlyTaggedMarshaller<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writedoc! {
             f,
@@ -205,7 +205,7 @@ struct InternallyTaggedMarshaller<'a> {
     variant: &'a UnionVariant,
 }
 
-impl<'a> fmt::Display for InternallyTaggedMarshaller<'a> {
+impl fmt::Display for InternallyTaggedMarshaller<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writedoc! {
             f,
@@ -230,7 +230,7 @@ impl<'a> fmt::Display for InternallyTaggedMarshaller<'a> {
 // Internal needs {"type": "tag", ..rest_fields}
 // External needs {"tag": {...}}
 
-impl<'a> fmt::Display for UnionUnmarshal<'a> {
+impl fmt::Display for UnionUnmarshal<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let details = self.0;
         writeln!(
@@ -307,7 +307,7 @@ struct AdjacentlyTaggedVariantUnmarshaller<'a> {
     all_variants: &'a [UnionVariant],
 }
 
-impl<'a> fmt::Display for AdjacentlyTaggedVariantUnmarshaller<'a> {
+impl fmt::Display for AdjacentlyTaggedVariantUnmarshaller<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "if temp.Tag == \"{}\" {{", self.variant.serialized_name)?;
         writeln!(
@@ -338,7 +338,7 @@ struct InternallyTaggedVariantUnmarshaller<'a> {
     all_variants: &'a [UnionVariant],
 }
 
-impl<'a> fmt::Display for InternallyTaggedVariantUnmarshaller<'a> {
+impl fmt::Display for InternallyTaggedVariantUnmarshaller<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writedoc!(
             f,

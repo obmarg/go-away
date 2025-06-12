@@ -37,7 +37,7 @@ pub enum SwiftType<'a> {
     Union(&'a types::Union),
 }
 
-impl<'a> fmt::Display for SwiftType<'a> {
+impl fmt::Display for SwiftType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             SwiftType::Struct(details) => {
@@ -72,7 +72,7 @@ impl<'a> fmt::Display for SwiftType<'a> {
 
 pub struct SwiftField<'a>(&'a Field);
 
-impl<'a> fmt::Display for SwiftField<'a> {
+impl fmt::Display for SwiftField<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         let details = self.0;
         write!(

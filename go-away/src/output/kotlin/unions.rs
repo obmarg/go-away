@@ -12,7 +12,7 @@ pub struct Union<'a> {
 }
 
 impl<'a> Union<'a> {
-    pub fn new(name: &'a str, representation: UnionRepresentation) -> Union {
+    pub fn new(name: &'a str, representation: UnionRepresentation) -> Union<'a> {
         Union {
             name,
             variants: Vec::new(),
