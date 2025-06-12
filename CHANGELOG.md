@@ -11,6 +11,13 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+## v0.6.0 - 2025-06-12
+
+### Breaking Changes
+
+- MSRV is now rust 1.78
+- We now expect the v1 of the `uuid` crate
+
 ### New Features
 
 - Incomplete support for generating types & codable instances for swift.
