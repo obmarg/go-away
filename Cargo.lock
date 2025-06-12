@@ -82,7 +82,7 @@ checksum = "2022715d62ab30faffd124d40b76f4134a550a87792276512b18d63272333394"
 
 [[package]]
 name = "go-away"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "chrono",
  "fs_extra",
@@ -98,7 +98,7 @@ dependencies = [
 
 [[package]]
 name = "go-away-derive"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "go-away-derive-internals",
  "syn 1.0.72",
@@ -106,7 +106,7 @@ dependencies = [
 
 [[package]]
 name = "go-away-derive-internals"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "insta",
  "proc-macro2",

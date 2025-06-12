@@ -11,6 +11,13 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+## v0.5.1 - 2025-06-12
+
+### Changes
+
+- bump MSRV to rust 1.78
+- fix a whole load of lints from recent rust (#39)
+
 ### New Features
 
 - Incomplete support for generating types & codable instances for swift.

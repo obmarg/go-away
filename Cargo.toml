@@ -2,7 +2,7 @@
 members = ["go-away", "go-away-derive", "go-away-derive-internals"]
 
 [workspace.package]
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Graeme Coupar <graeme@polyandglot.dev>"]
 edition = "2018"
 license = "MPL-2.0"

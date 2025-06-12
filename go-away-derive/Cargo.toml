@@ -16,4 +16,4 @@ proc-macro = true
 
 [dependencies]
 syn = "1.0"
-go-away-derive-internals = { path = "../go-away-derive-internals", version = "0.5.0" }
+go-away-derive-internals = { path = "../go-away-derive-internals", version = "0.5.1" }
