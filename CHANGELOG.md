@@ -11,12 +11,12 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
-## v0.5.1 - 2025-06-12
+## v0.6.0 - 2025-06-12
 
-### Changes
+### Breaking Changes
 
-- bump MSRV to rust 1.78
-- fix a whole load of lints from recent rust (#39)
+- MSRV is now rust 1.78
+- We now expect the v1 of the `uuid` crate
 
 ### New Features
 
