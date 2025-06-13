@@ -11,6 +11,16 @@ all APIs might be changed.
 
 ## Unreleased - xxxx-xx-xx
 
+## v0.6.1 - 2025-06-13
+
+### Bug Fixes
+
+- cargo audit advisories(#46)
+
+### Changes
+
+- update Cargo.lock dependencies
+
 ## v0.6.0 - 2025-06-12
 
 ### Breaking Changes
