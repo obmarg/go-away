@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use go_away::{registry_to_output, TypeMetadata, TypeRegistry};
 
 #[cfg(feature = "chrono")]
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::DateTime;
 
 #[derive(TypeMetadata, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type")]
@@ -79,7 +79,9 @@ fn test_datetime() {
         "datetime",
         "DateTimeEnum",
         &[DateTimeEnum::One {
-            a: DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(61, 0), Utc),
+            a: DateTime::from_timestamp(61, 0)
+                .expect("valid timestamp")
+                .to_utc(),
         }],
     );
 }
