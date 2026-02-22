@@ -1,4 +1,10 @@
+
+> [!IMPORTANT]  
+> This repository has been migrated to [Codeberg](https://codeberg.org/obmarg/go-away).
+
 <div align="center">
+  <h3></h3>
+  <h1></h1>
   <h1>Go Away</h1>
 
   <p>
